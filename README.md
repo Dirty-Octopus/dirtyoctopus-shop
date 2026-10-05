@@ -320,3 +320,16 @@ npx wrangler d1 export dirtyoctopus-shop --remote --output=backups/orders-2026-1
 QQ 讨论群在 `public/site-config.json` 的 `qqGroup` 中统一配置，目前为 `974329105`。首页提供群号和复制按钮；交易资料仍通过开发者个人 QQ／微信私聊核验。删除或留空 `qqGroup` 会隐藏讨论群入口，不影响购买。
 
 首页仅浏览插件，点击图片进入 `/plugins/spectral-corruptor/` 详情与试听；`/orders/` 显示本设备订单，`/contact/` 显示联系方式及 QQ 群。顶部导航对应独立页面。
+
+## 2026-10 开售与内容管理
+
+- 正式开售：**北京时间 2026 年 10 月 6 日 21:09:09**（UTC `2026-10-06T13:09:09Z`）。唯一时间常量在 `shared/launch.ts`。到点自动放开，无须再次部署。`GET /api/sale` 返回服务器时间和开售状态；正式 Worker 在开售前拒绝创建订单。仅 `ENVIRONMENT=local` 且请求为 localhost 时允许本地提前测试。
+- 点击购买前检查服务端开售状态；未开售进入 `/waiting/` 大留白倒计时页。页面到点显示购买链接，不自动下单。客户端时间不构成后端授权。
+- 新订单在创建后 **30 分钟**仍为 `PENDING_PAYMENT` 时变为 `EXPIRED`，不能继续提交交易单号、核验或完成。已经提交交易单号的订单不自动过期，因为提交本身不能证明付款与否。请求时精确检查，Worker 每五分钟也清理过期状态。遇到已经付款但超时的情况，买家应私聊提供原订单和付款证据，避免重复付款。
+- 管理后台增加编号前缀、状态、归档筛选，以及创建时间/编号升降序；筛选在服务端执行，分页沿用相同筛选条件。归档/恢复不删除记录、不改变支付状态，客户仍能用原凭证查看。
+- 支持者页 `/supporters/`：公开昵称、留言，只有后台能录入修改。每笔已核验或已完成订单最多一条，重复保存覆盖原条目；可取消公开，退款后自动不再公开。没有账户系统，因此同一人的多笔订单需由管理员人工识别，避免重复留名。公开 API 不返回订单号、交易单号、备注和访问凭证。昵称最多 60 字符、留言最多 1000 字符，均为纯文本。
+- “我想说的话”页 `/words/`：Logo、名称和后台维护的纯文本正文，保留换行。最多 2000 字符，清空后显示“文字正在准备中”。
+- 专用后台：[支持者与文字管理](https://dirtyoctopus-shop-api.umckspectre.workers.dev/admin/content/)。也可从订单后台顶部进入。复用现有 Cloudflare Access `/admin/*` 和 `/api/admin/*` 保护，无需新增公开写入入口。先核验订单付款，再输入订单号、昵称、留言，点击保存；已录入列表可选中编辑。
+- 新增接口：公开只读 `GET /api/supporters`、`GET /api/words`；后台 `GET /api/admin/supporters`、`GET/POST /api/admin/supporters/:orderId`、`GET/POST /api/admin/words`、`POST /api/admin/orders/:id/archive`、`POST /api/admin/orders/:id/unarchive`。后台写入继续验证 Access JWT、同源 Origin 及 `X-Admin-Request`。
+- migration `0002_public_content.sql` 扩展订单状态并保留已有订单，增加归档、过期时间与内容表。部署前先导出 D1 备份，再执行 migration，最后部署 Worker。备份不得提交 Git。
+- 试听现有 Glossy Neuro，另加 Additive Pads、Cool Arps 两组。运行 `python3 scripts/prepare-demo.py` 从根目录本地 WAV 生成 MP3 与波形；只提交转换后的资源。两组新增素材前后长度不同，A/B 切换保留时间并限制到目标片段长度，切换整组片段会暂停并回到开头。

@@ -3,10 +3,13 @@ import { SALE_START_MS } from "../shared/launch";
 const countdown = document.querySelector<HTMLElement>("#countdown")!,
   ready = document.querySelector<HTMLElement>("#sale-ready")!;
 let offset = 0,
-  confirmedOpen = false;
+  confirmedOpen = false,
+  calibrating = false;
 const apiBase =
   __SHOP_API_BASE__ || (import.meta.env.DEV ? "http://127.0.0.1:8787" : "");
 async function calibrate() {
+  if (calibrating) return;
+  calibrating = true;
   try {
     const r = await fetch(apiBase + "/api/sale", {
       cache: "no-store",
@@ -19,6 +22,8 @@ async function calibrate() {
     tick();
   } catch {
     countdown.textContent = "正在重试校准时间…";
+  } finally {
+    calibrating = false;
   }
 }
 function tick() {
