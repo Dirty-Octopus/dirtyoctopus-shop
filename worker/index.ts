@@ -397,7 +397,7 @@ export default {
     headers.set("Vary", "Origin");
     headers.set(
       "Content-Security-Policy",
-      "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
+      "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
     );
     if (allowedOrigin) {
       headers.set("Access-Control-Allow-Origin", origin!);

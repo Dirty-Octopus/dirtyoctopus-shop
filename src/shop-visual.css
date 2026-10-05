@@ -1,0 +1,233 @@
+/* Commerce-specific content; the surrounding chassis/effects use the original portfolio CSS. */
+[hidden] {
+  display: none !important;
+}
+body.boot-visible {
+  overflow: hidden;
+}
+body.boot-visible:not(.portal-opening) #site {
+  visibility: hidden;
+}
+.language-entry:not(.is-ready) {
+  visibility: hidden;
+  pointer-events: none;
+}
+.commerce {
+  padding: 24px;
+  color: var(--ink);
+  --line: var(--edge);
+  --muted: var(--secondary);
+  --low: var(--panel-low);
+  --blue: var(--panel-high);
+}
+.commerce .product-hero {
+  margin: 0;
+  grid-template-columns: minmax(250px, 0.8fr) minmax(0, 1.2fr);
+  gap: 24px;
+  background: var(--panel-low);
+}
+.commerce .preview,
+.commerce .panel,
+.commerce .how-section,
+.commerce .recent-section,
+.commerce .contact-section {
+  background: var(--panel);
+  border-color: var(--edge);
+}
+.commerce .product-copy {
+  padding: 24px;
+}
+.commerce h1 {
+  color: var(--ink);
+}
+.commerce .preview img {
+  filter: none;
+  width: 100%;
+  height: auto;
+}
+.commerce .price {
+  color: var(--accent);
+}
+.commerce .button {
+  border-color: var(--edge);
+  color: var(--ink);
+  background: var(--panel-low);
+}
+.commerce .button.primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.commerce input,
+.commerce textarea {
+  color: var(--ink);
+  background: var(--panel-low);
+}
+.commerce .process-strip {
+  background: var(--panel-low);
+}
+.commerce .recent-order {
+  background: var(--panel-low);
+}
+.audio-demo {
+  margin: 28px 0;
+  border: 1px solid var(--edge);
+  background: var(--panel-low);
+  padding: 24px;
+}
+.demo-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+.audio-demo h2 {
+  font-family: var(--display);
+  font-size: 40px;
+}
+.demo-switch {
+  display: flex;
+  gap: 8px;
+  margin: 20px 0;
+}
+.demo-switch button {
+  padding: 14px 24px;
+  border: 1px solid var(--edge);
+  background: var(--panel);
+  color: var(--ink);
+}
+.demo-switch [aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.demo-wave {
+  width: 100%;
+  height: 100px;
+  display: block;
+}
+.demo-controls {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.demo-controls input {
+  width: 150px;
+}
+.demo-seek {
+  width: 100%;
+  margin: 12px 0;
+}
+.demo-time {
+  font-family: var(--mono);
+  font-size: 12px;
+}
+.audio-demo p {
+  font-size: 13px;
+  color: var(--secondary);
+}
+.navigation-block .nav {
+  text-decoration: none;
+}
+.header-tools {
+  min-width: 90px;
+}
+#system-open [data-icon] {
+  font-size: 24px;
+}
+.system-content p {
+  line-height: 1.5;
+}
+footer {
+  gap: 16px;
+}
+.commerce .notice {
+  position: relative;
+  z-index: 1;
+}
+.skip {
+  position: absolute;
+}
+@media (max-width: 700px) {
+  .commerce {
+    padding: 12px;
+  }
+  .commerce .product-hero {
+    grid-template-columns: 1fr;
+  }
+  .commerce .product-copy {
+    padding: 16px;
+  }
+  .audio-demo {
+    padding: 16px;
+  }
+  .demo-heading {
+    display: block;
+  }
+  .demo-switch button {
+    flex: 1;
+    padding: 12px 8px;
+  }
+  .commerce h1 {
+    font-size: 54px;
+  }
+  .commerce .contacts {
+    flex-wrap: wrap;
+  }
+}
+
+.reference-swatch-0 {
+  --swatch: #142330;
+}
+.reference-swatch-1 {
+  --swatch: #4d8fb8;
+}
+.reference-swatch-2 {
+  --swatch: #9ac9e2;
+}
+.reference-swatch-3 {
+  --swatch: #080808;
+}
+.reference-swatch-4 {
+  --swatch: #ff302b;
+}
+.reference-swatch-5 {
+  --swatch: #fff100;
+}
+.reference-swatch-6 {
+  --swatch: #164eff;
+}
+.reference-swatch-7 {
+  --swatch: #202020;
+}
+.reference-swatch-8 {
+  --swatch: #898989;
+}
+.reference-swatch-9 {
+  --swatch: #eeeeee;
+}
+
+.community-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  margin: 20px 0;
+}
+.community-panel p {
+  font-size: 13px;
+}
+.community-panel > div:last-child {
+  display: grid;
+  gap: 12px;
+}
+.community-panel strong {
+  font: 28px var(--mono);
+  color: var(--accent);
+}
+@media (max-width: 700px) {
+  .community-panel {
+    display: block;
+  }
+  .community-panel > div:last-child {
+    margin-top: 20px;
+  }
+}

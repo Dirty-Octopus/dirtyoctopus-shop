@@ -1,7 +1,9 @@
+import "@fontsource/barlow-condensed/latin-500.css";
 import "@fontsource/barlow-condensed/latin-600.css";
 import "@fontsource/barlow-condensed/latin-700.css";
 import "@fontsource/ibm-plex-mono/latin-400.css";
 import "./style.css";
+import "./visual-shell.js";
 import { money, statusLabels, type CustomerOrder } from "../shared/catalog";
 
 export const local = ["localhost", "127.0.0.1", "[::1]"].includes(
@@ -116,6 +118,7 @@ export function orderDetails(list: HTMLElement, order: CustomerOrder) {
 export interface SiteConfig {
   qq: string;
   wechat: string;
+  qqGroup?: string;
 }
 export function contactReady(value: string) {
   return Boolean(value.trim()) && value !== "REPLACE_ME";
@@ -130,6 +133,14 @@ export async function loadContacts(): Promise<boolean> {
     el.textContent = config.qq;
   for (const el of document.querySelectorAll('[data-contact="wechat"]'))
     el.textContent = config.wechat;
+  const group =
+    typeof config.qqGroup === "string" && /^\d{5,12}$/.test(config.qqGroup)
+      ? config.qqGroup
+      : "";
+  for (const el of document.querySelectorAll('[data-contact="qqGroup"]'))
+    el.textContent = group;
+  for (const el of document.querySelectorAll<HTMLElement>("[data-community]"))
+    el.hidden = !group;
   return contactReady(config.qq) || contactReady(config.wechat);
 }
 export async function copy(value: string, button: HTMLButtonElement) {

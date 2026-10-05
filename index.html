@@ -11,7 +11,7 @@
     />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self' __API_CONNECT_SRC__; object-src 'none'; base-uri 'none'; form-action 'self'"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self' __API_CONNECT_SRC__; object-src 'none'; base-uri 'none'; form-action 'self'"
     />
     <title>音频插件商店 / Dirty Octopus</title>
     <link rel="icon" href="/assets/dirty-octopus.svg" type="image/svg+xml" />
@@ -69,8 +69,8 @@
               ><img
                 src="/assets/spectral-corruptor.png"
                 alt="Spectral Corruptor 的输入输出频谱、模块信号链和频域效果参数界面"
-                width="1180"
-                height="820"
+                width="2360"
+                height="1640"
                 fetchpriority="high"
             /></a>
             <figcaption>真实插件界面 <span>点击查看大图 ↗</span></figcaption>
@@ -97,6 +97,49 @@
               >打开订单</a
             >
           </div>
+        </section>
+        <section id="demo" class="audio-demo" aria-labelledby="demo-title">
+          <div class="demo-heading">
+            <div>
+              <p>PROCESSING COMPARISON / 01</p>
+              <h2 id="demo-title">NEURO SQUARIFIER</h2>
+            </div>
+            <p>
+              Glossy Neuro · 同一片段，处理前后对比<br />切换时保留播放位置，不作响度归一化。
+            </p>
+          </div>
+          <div class="demo-switch" role="group" aria-label="处理版本">
+            <button data-demo="before" aria-pressed="true">A / 处理前</button
+            ><button data-demo="after" aria-pressed="false">B / 处理后</button>
+          </div>
+          <canvas id="demo-wave" class="demo-wave" aria-hidden="true"></canvas>
+          <input
+            id="demo-seek"
+            class="demo-seek"
+            type="range"
+            min="0"
+            max="100"
+            step="0.1"
+            value="0"
+            aria-label="试听进度"
+          />
+          <div class="demo-controls">
+            <button id="demo-play" class="button primary">播放试听 ▶</button
+            ><button id="demo-loop" class="button" aria-pressed="true">
+              循环：开</button
+            ><span id="demo-time" class="demo-time">0:00 / 0:00</span
+            ><label for="demo-volume">音量</label
+            ><input
+              id="demo-volume"
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value="0.65"
+              aria-label="试听音量"
+            />
+          </div>
+          <p id="demo-status" role="status"></p>
         </section>
         <section class="how-section" aria-labelledby="how-title">
           <div class="section-title">
@@ -164,6 +207,29 @@
               <dd data-contact="wechat">REPLACE_ME</dd>
             </div>
           </dl>
+        </section>
+        <section
+          class="community-panel panel"
+          data-community
+          hidden
+          aria-labelledby="community-title"
+        >
+          <div>
+            <p class="eyebrow">COMMUNITY / QQ GROUP</p>
+            <h2 id="community-title">一起讨论插件。</h2>
+            <p>
+              欢迎加入 Dirty Octopus
+              粉丝／亲友群，交流插件使用、声音设计与作品。
+            </p>
+            <p class="muted small">
+              在 QQ 中搜索群号申请加入。付款核验资料请通过上方
+              QQ／微信私聊发送。
+            </p>
+          </div>
+          <div>
+            <strong data-contact="qqGroup" id="qq-group"></strong
+            ><button id="copy-group" class="button">复制群号</button>
+          </div>
         </section>
       </main>
       <footer>

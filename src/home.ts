@@ -99,3 +99,12 @@ async function showRecent() {
   );
 }
 void showRecent();
+
+import "./demo";
+
+$("#copy-group").addEventListener("click", (event) =>
+  copy(
+    $("#qq-group").textContent || "",
+    event.currentTarget as HTMLButtonElement,
+  ),
+);

@@ -1,4 +1,5 @@
-import { test, expect, type Page } from "@playwright/test";
+import { visualClick as click } from "./visual-click";
+import { test, expect, type Page, type Locator } from "@playwright/test";
 import type { AdminOrder } from "../../shared/catalog";
 import siteConfig from "../../public/site-config.json" with { type: "json" };
 
@@ -6,7 +7,7 @@ test("生产构建：外部样式、真实联系方式、严格 CSP 与响应式
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto("http://127.0.0.1:4183/");
+  await visit(page, "http://127.0.0.1:4183/");
   await page.evaluate(() => document.fonts.ready);
   const buy = page.getByRole("button", { name: "创建订单并购买" });
   if (siteConfig.apiBase) await expect(buy).toBeEnabled();
@@ -21,7 +22,7 @@ test("生产构建：外部样式、真实联系方式、严格 CSP 与响应式
     await page.evaluate(
       () => getComputedStyle(document.documentElement).backgroundColor,
     ),
-  ).toBe("rgb(16, 17, 18)");
+  ).toBe("rgba(0, 0, 0, 0)");
   const csp = await page
     .locator('meta[http-equiv="Content-Security-Policy"]')
     .getAttribute("content");
@@ -59,7 +60,7 @@ test("未配置联系方式时阻止购买，实际新付款码与插件图片�
   await page.route("**/site-config.json", (route) =>
     route.fulfill({ json: { qq: "REPLACE_ME", wechat: "REPLACE_ME" } }),
   );
-  await page.goto("/");
+  await visit(page, "/");
   await expect(
     page.getByRole("button", { name: "创建订单并购买" }),
   ).toBeDisabled();
@@ -98,8 +99,8 @@ test("真实本地 Worker：创建 → 提交 → 刷新 → 最近订单，不�
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await testContacts(page);
-  await page.goto("/");
-  await page.getByRole("button", { name: "创建订单并购买" }).click();
+  await visit(page, "/");
+  await click(page.getByRole("button", { name: "创建订单并购买" }));
   await expect(page).toHaveURL(/\/order\/\?id=DO-[A-F0-9]{16}$/);
   const orderUrl = page.url();
   await expect(page.locator("#order-status")).toHaveText("等待付款");
@@ -109,7 +110,7 @@ test("真实本地 Worker：创建 → 提交 → 刷新 → 最近订单，不�
   );
   const ref = `TEST${Date.now()}E2E`;
   await page.getByLabel("微信支付交易单号", { exact: true }).fill(ref);
-  await page.getByRole("button", { name: "提交付款信息" }).click();
+  await click(page.getByRole("button", { name: "提交付款信息" }));
   await expect(page.locator("#order-status")).toHaveText(
     "付款信息已提交，等待人工核验",
   );
@@ -123,9 +124,9 @@ test("真实本地 Worker：创建 → 提交 → 刷新 → 最近订单，不�
   await expect(page.locator("#order-status")).toHaveText(
     "付款信息已提交，等待人工核验",
   );
-  await page.goto("/");
+  await visit(page, "/");
   await expect(page.locator(".recent-order")).toHaveCount(1);
-  await page.locator(".recent-order").click();
+  await click(page.locator(".recent-order"));
   await expect(page).toHaveURL(orderUrl);
   expect(errors).toEqual([]);
 });
@@ -134,8 +135,8 @@ test("跨设备需要访问凭证，错误凭证不能查看；备份凭证可�
   browser,
 }) => {
   await testContacts(page);
-  await page.goto("/");
-  await page.getByRole("button", { name: "创建订单并购买" }).click();
+  await visit(page, "/");
+  await click(page.getByRole("button", { name: "创建订单并购买" }));
   await expect(page.locator("#order-status")).toHaveText("等待付款");
   const url = page.url();
   const token = await page.locator("#access-token").inputValue();
@@ -148,12 +149,12 @@ test("跨设备需要访问凭证，错误凭证不能查看；备份凭证可�
   await other
     .getByLabel("Customer Access Token / 订单访问凭证")
     .fill("A".repeat(43));
-  await other.getByRole("button", { name: "打开订单", exact: true }).click();
+  await click(other.getByRole("button", { name: "打开订单", exact: true }));
   await expect(other.locator("#message")).toContainText(
     "订单不存在或访问凭证无效",
   );
   await other.getByLabel("Customer Access Token / 订单访问凭证").fill(token);
-  await other.getByRole("button", { name: "打开订单", exact: true }).click();
+  await click(other.getByRole("button", { name: "打开订单", exact: true }));
   await expect(other.locator("#order-status")).toHaveText("等待付款");
   expect(other.url()).not.toContain(token);
   await context.close();
@@ -163,8 +164,8 @@ test("手机 390px 与 320px 不横向溢出，最近订单中的恶意存储不
 }) => {
   for (const width of [390, 320]) {
     await page.setViewportSize({ width, height: 844 });
-    await page.goto("/");
-    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await visit(page, "/");
+    await expect(page.locator("#product-title")).toBeVisible();
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth > innerWidth,
     );
@@ -184,8 +185,8 @@ test("手机 390px 与 320px 不横向溢出，最近订单中的恶意存储不
 });
 test("订单手机布局及输入错误处理", async ({ page }) => {
   await testContacts(page);
-  await page.goto("/");
-  await page.getByRole("button", { name: "创建订单并购买" }).click();
+  await visit(page, "/");
+  await click(page.getByRole("button", { name: "创建订单并购买" }));
   await expect(page.locator("#order-status")).toHaveText("等待付款");
   for (const width of [390, 320]) {
     await page.setViewportSize({ width, height: 844 });
@@ -196,7 +197,7 @@ test("订单手机布局及输入错误处理", async ({ page }) => {
     ).toBe(false);
   }
   await page.getByLabel("微信支付交易单号", { exact: true }).fill("123");
-  await page.getByRole("button", { name: "提交付款信息" }).click();
+  await click(page.getByRole("button", { name: "提交付款信息" }));
   await expect(page.locator("#order-status")).toHaveText("等待付款");
   expect(
     await page
@@ -244,7 +245,7 @@ test("管理 UI：展示备注为文本、人工确认弹窗、核验后再完�
     });
   });
   await page.goto("/console/");
-  await page.getByRole("button", { name: order.id, exact: true }).click();
+  await click(page.getByRole("button", { name: order.id, exact: true }));
   await expect(page.locator("#admin-note")).toHaveValue(
     "<img src=x onerror=alert(1)>",
   );
@@ -252,18 +253,24 @@ test("管理 UI：展示备注为文本、人工确认弹窗、核验后再完�
   await expect(
     page.getByRole("button", { name: "标记已完成", exact: true }),
   ).toBeDisabled();
-  await page
-    .getByRole("button", { name: "标记付款已核验", exact: true })
-    .click();
-  await expect(page.getByRole("dialog")).toContainText(
+  await click(
+    page.getByRole("button", { name: "标记付款已核验", exact: true }),
+  );
+  await expect(page.locator("#confirm-dialog")).toContainText(
     "人工确认收到了此订单的正确金额",
   );
-  await page.getByRole("button", { name: "确认已完成此人工操作" }).click();
+  await click(page.getByRole("button", { name: "确认已完成此人工操作" }));
   await expect(page.locator("#detail-status")).toContainText("付款已人工核验");
-  await page.getByRole("button", { name: "标记已完成", exact: true }).click();
-  await page.getByRole("button", { name: "确认已完成此人工操作" }).click();
+  await click(page.getByRole("button", { name: "标记已完成", exact: true }));
+  await click(page.getByRole("button", { name: "确认已完成此人工操作" }));
   await expect(page.locator("#detail-status")).toContainText("已完成");
   await page.locator("#admin-note").fill("人工核验备注");
-  await page.getByRole("button", { name: "保存备注" }).click();
+  await click(page.getByRole("button", { name: "保存备注" }));
   await expect(page.locator("#message")).toContainText("备注已保存");
 });
+
+async function visit(page: Page, url: string) {
+  await page.goto(url);
+  await page.locator("#enter").click();
+  await expect(page.locator("#boot")).toBeHidden({ timeout: 10000 });
+}

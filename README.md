@@ -306,3 +306,15 @@ npx wrangler d1 export dirtyoctopus-shop --remote --output=backups/orders-2026-1
 - [ ] 备份一次 D1，并确认备份不在 Git 中。
 
 没有配置云端账户、DNS 和 Access 之前，**本地构建与测试通过不等于已经正式上线**。
+
+## 主站视觉与试听维护
+
+商店的外壳、主题、CRT 曲面及鼠标坐标映射、屏幕彩噪、入口地形、机械展开和金属标志移植自 `Portfolio4Music`。原作品集仓库没有修改。源视觉模块保存在 `src/portfolio/`，商店接入层是 `src/visual-shell.js`，交易内容样式是 `src/shop-visual.css`。没有引入作品集音频、界面音效或背景音乐。
+
+首页新增 Neuro Squarifier 的 Glossy Neuro A/B 试听：A 为 `GlossyNeuro_b4.wav`，B 为 `GlossyNeuro_after.wav`。两者保持原始响度差异；切换保留时间，支持播放、暂停、进度、音量与循环。只有点击播放才会发声。
+
+原始 WAV 位于根目录并被 Git 忽略，提交的是 `public/assets/audio/` 下的 192 kbps MP3 和 `src/demo-peaks.json` 波形。更新原始文件后，在装有 ffmpeg 的本机执行 `python3 scripts/prepare-demo.py`，再执行 `npm run check`、`npm run test:e2e`，提交生成结果。部署机器不需要 ffmpeg。
+
+视觉设置独立存储在 `shop-visual-*`，重置视觉不会删除订单凭证。移动端默认关闭 CRT 曲面；系统减少动态效果的偏好会暂停动画和彩噪刷新。订单和后台直接显示内容，首页保留主站入口展开效果。
+
+QQ 讨论群在 `public/site-config.json` 的 `qqGroup` 中统一配置，目前为 `974329105`。首页提供群号和复制按钮；交易资料仍通过开发者个人 QQ／微信私聊核验。删除或留空 `qqGroup` 会隐藏讨论群入口，不影响购买。

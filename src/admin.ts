@@ -105,7 +105,10 @@ async function openOrder(id: string) {
     { admin: true },
   );
   renderDetail(order);
-  $("#admin-detail").scrollIntoView({ block: "start" });
+  window.scrollBy({
+    top: $("#admin-detail").getBoundingClientRect().top - 40,
+    behavior: "instant",
+  });
 }
 function confirmAction(action: string, id: string): Promise<boolean> {
   const dialog = $<HTMLDialogElement>("#confirm-dialog");
