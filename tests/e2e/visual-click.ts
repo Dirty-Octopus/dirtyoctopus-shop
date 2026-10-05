@@ -6,27 +6,35 @@ export async function visualClick(control: Locator) {
   await expect(control).toBeVisible();
   await expect(control).toBeEnabled();
   await control.page().evaluate(() => document.fonts.ready);
-  await control.evaluate(async (el) => {
-    const r = el.getBoundingClientRect();
-    if (!el.closest("dialog") && (r.top < 50 || r.bottom > innerHeight - 50))
-      window.scrollBy({ top: r.top - innerHeight / 2, behavior: "instant" });
-    await new Promise<void>((resolve) =>
-      requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
-    );
-  });
   await expect
-    .poll(() =>
-      control
-        .page()
-        .evaluate(() =>
+    .poll(async () =>
+      control.evaluate(async (el) => {
+        const r = el.getBoundingClientRect();
+        if (
+          !el.closest("dialog") &&
+          (r.top < 40 || r.bottom > innerHeight - 40)
+        ) {
+          window.scrollBy({
+            top: r.top - innerHeight / 2,
+            behavior: "instant",
+          });
+          await new Promise<void>((resolve) =>
+            requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+          );
+        }
+        const now = el.getBoundingClientRect();
+        return (
+          now.top >= 0 &&
+          now.bottom <= innerHeight &&
           Math.abs(
             parseFloat(
               (document.querySelector("#site") as HTMLElement).style.top || "0",
             ) + scrollY,
-          ),
-        ),
+          ) < 1
+        );
+      }),
     )
-    .toBeLessThan(1);
+    .toBe(true);
   const bounds = await control.boundingBox();
   if (!bounds) throw new Error("Control has no bounds");
   let point = {

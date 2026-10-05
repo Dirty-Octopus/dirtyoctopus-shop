@@ -45,6 +45,22 @@ export function initViewportSurface() {
       scroll();
     }
   });
+  document.addEventListener("contentscroll", (event) => {
+    measure();
+    window.scrollBy({
+      top: event.detail.element.getBoundingClientRect().top - event.detail.top,
+      behavior: "instant",
+    });
+    scroll();
+  });
   measure();
   scroll();
+}
+
+// Commerce panels can grow immediately before navigation. Measure their new
+// height before scrolling so the browser does not clamp to the old document.
+export function scrollContentIntoView(element, top = 40) {
+  document.dispatchEvent(
+    new CustomEvent("contentscroll", { detail: { element, top } }),
+  );
 }

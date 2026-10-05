@@ -1,3 +1,4 @@
+import { scrollContentIntoView } from "./portfolio/viewport.js";
 import {
   $,
   api,
@@ -118,10 +119,7 @@ $("#reference-form").addEventListener("submit", (event) => {
     message(
       "付款信息已提交，等待人工核验。下一步：添加 QQ / 微信并发送订单号、付款截图和 Machine ID。",
     );
-    window.scrollBy({
-      top: $("#after-submission").getBoundingClientRect().top - 40,
-      behavior: "instant",
-    });
+    scrollContentIntoView($("#after-submission"));
   });
 });
 $("#restore-form").addEventListener("submit", (event) => {

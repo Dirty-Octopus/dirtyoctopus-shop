@@ -1,3 +1,4 @@
+import { scrollContentIntoView } from "./portfolio/viewport.js";
 import {
   $,
   addDefinition,
@@ -105,10 +106,7 @@ async function openOrder(id: string) {
     { admin: true },
   );
   renderDetail(order);
-  window.scrollBy({
-    top: $("#admin-detail").getBoundingClientRect().top - 40,
-    behavior: "instant",
-  });
+  scrollContentIntoView($("#admin-detail"));
 }
 function confirmAction(action: string, id: string): Promise<boolean> {
   const dialog = $<HTMLDialogElement>("#confirm-dialog");
