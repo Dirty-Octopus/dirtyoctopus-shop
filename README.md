@@ -3,7 +3,7 @@
 一个小型、人工核验付款的插件商店：GitHub Pages 静态前端 + TypeScript Cloudflare Worker + D1。没有账户、购物车、自动支付、截图上传或 License 系统。
 
 - 商店：`https://shop.dirtyoctopus.net`
-- API：`https://dirtyoctopus-shop-api.<你的 Cloudflare 子域>.workers.dev`
+- API：`https://dirtyoctopus-shop-api.umckspectre.workers.dev`
 - 管理入口：商店 `/admin/` 跳转到上述 Worker 的 `/admin/`
 - 域名注册、续费及 DNS 均保留在 **Namecheap**；不修改 Nameservers，不需要 `api.dirtyoctopus.net`。
 - 商品：Spectral Corruptor，`spectral-corruptor`，**9990 分 / ¥99.90 CNY**。
@@ -69,7 +69,7 @@ npm run dev
 
 本地管理员没有绕过认证的开关。`npm test` 用临时 RSA 密钥签发 JWT 并模拟 Cloudflare JWKS 响应，验证真正的签名校验逻辑；浏览器管理 UI 测试仅模拟 API 响应。要手动体验生产管理流程，应配置 Access 后在生产或独立测试 Worker 上登录。
 
-生产 API 地址只需填写 `public/site-config.json` 的 `apiBase`，然后重新构建、推送。构建时会同步写入前端与 HTML 的 CSP `connect-src`，不需要再到多个页面修改域名，也不会放行全部 `*.workers.dev`。当前 `apiBase` 留空，因为尚未取得真实 Cloudflare 地址；空值允许发布商品展示页，但禁用购买并保留管理入口的配置说明。
+生产 API 地址只需填写 `public/site-config.json` 的 `apiBase`，然后重新构建、推送。构建时会同步写入前端与 HTML 的 CSP `connect-src`，不需要再到多个页面修改域名，也不会放行全部 `*.workers.dev`。当前已填写实际 Worker 地址。若将 `apiBase` 留空，仍可发布商品展示页，但会禁用购买并保留管理入口的配置说明。
 
 本地开发默认连接 `http://127.0.0.1:8787`；可以用 `.env.local` 中的 `VITE_API_BASE` 覆盖公开地址。生产构建只接受不含路径的 HTTPS origin，禁止本地 HTTP 地址。`VITE_` 变量与 `site-config.json` 都是公开数据，**绝不能放 Cloudflare Token、Access 服务凭证或其他 Secret**。
 

@@ -12,14 +12,14 @@
   },
   "vars": {
     "ENVIRONMENT": "production",
-    "ACCESS_TEAM_DOMAIN": "https://REPLACE_ME.cloudflareaccess.com",
-    "ACCESS_AUD": "REPLACE_ME",
+    "ACCESS_TEAM_DOMAIN": "https://noisy-base-4a50.cloudflareaccess.com",
+    "ACCESS_AUD": "7e58b53b7ae6ad5e274283857a412cb1a173b906c267eacd18f9aab4fd61c0c2",
   },
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "dirtyoctopus-shop",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "43d6fcfc-293c-467d-bc54-7080e6ffaec4",
       "migrations_dir": "migrations",
     },
   ],
