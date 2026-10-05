@@ -15,7 +15,7 @@ export async function visualClick(control: Locator) {
           (r.top < 40 || r.bottom > innerHeight - 40)
         ) {
           window.scrollBy({
-            top: r.top - innerHeight / 2,
+            top: r.top + r.height / 2 - innerHeight / 2,
             behavior: "instant",
           });
           await new Promise<void>((resolve) =>
@@ -24,8 +24,8 @@ export async function visualClick(control: Locator) {
         }
         const now = el.getBoundingClientRect();
         return (
-          now.top >= 0 &&
-          now.bottom <= innerHeight &&
+          now.top + now.height / 2 >= 0 &&
+          now.top + now.height / 2 <= innerHeight &&
           Math.abs(
             parseFloat(
               (document.querySelector("#site") as HTMLElement).style.top || "0",

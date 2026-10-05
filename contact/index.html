@@ -13,7 +13,7 @@
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self' __API_CONNECT_SRC__; object-src 'none'; base-uri 'none'; form-action 'self'"
     />
-    <title>音频插件商店 / Dirty Octopus</title>
+    <title>联系方式 / Dirty Octopus</title>
     <link rel="icon" href="/assets/dirty-octopus.svg" type="image/svg+xml" />
   </head>
   <body>
@@ -40,42 +40,46 @@
         </nav>
       </header>
       <main id="main">
-        <section class="product-hero" aria-labelledby="product-title">
-          <div class="product-copy">
-            <p class="eyebrow">FREQUENCY DOMAIN / AUDIO PLUGIN</p>
-            <h1 id="product-title">SPECTRAL<br /><span>CORRUPTOR</span></h1>
-            <p class="intro">重塑频谱。<br />让声音偏离预期。</p>
-            <p class="description">
-              来自 Dirty Octopus
-              的模块化频域声音处理插件。探索谐波、频移与频谱破坏，搭建属于你的信号链。
+        <section class="contact-section" aria-labelledby="contact-title">
+          <div>
+            <h2 id="contact-title">有问题，直接联系我。</h2>
+            <p class="muted">
+              购买前可确认插件兼容性；付款后请带上商店订单号。
             </p>
-            <div class="purchase">
-              <span class="price">¥99.90<small>CNY / 人工激活</small></span
-              ><a class="button primary" href="/plugins/spectral-corruptor/"
-                >查看详情与试听 ↗</a
-              >
-            </div>
-            <p class="muted small">微信扫码付款 · QQ / 微信人工交付激活码</p>
           </div>
-          <figure class="preview">
-            <div class="panel-bar">
-              <span>插件界面预览</span><span>SIGNAL PROCESSOR</span>
+          <dl class="contacts">
+            <div>
+              <dt>QQ</dt>
+              <dd data-contact="qq">REPLACE_ME</dd>
             </div>
-            <a
-              href="/plugins/spectral-corruptor/"
-              rel="noopener"
-              aria-label="查看 Spectral Corruptor 插件详情"
-              ><img
-                src="/assets/spectral-corruptor.png"
-                alt="Spectral Corruptor 的输入输出频谱、模块信号链和频域效果参数界面"
-                width="2360"
-                height="1640"
-                fetchpriority="high"
-            /></a>
-            <figcaption>
-              真实插件界面 <span>点击查看详情与试听 ↗</span>
-            </figcaption>
-          </figure>
+            <div>
+              <dt>微信</dt>
+              <dd data-contact="wechat">REPLACE_ME</dd>
+            </div>
+          </dl>
+        </section>
+        <section
+          class="community-panel panel"
+          data-community
+          hidden
+          aria-labelledby="community-title"
+        >
+          <div>
+            <p class="eyebrow">COMMUNITY / QQ GROUP</p>
+            <h2 id="community-title">一起讨论插件。</h2>
+            <p>
+              欢迎加入 Dirty Octopus
+              粉丝／亲友群，交流插件使用、声音设计与作品。
+            </p>
+            <p class="muted small">
+              在 QQ 中搜索群号申请加入。付款核验资料请通过上方
+              QQ／微信私聊发送。
+            </p>
+          </div>
+          <div>
+            <strong data-contact="qqGroup" id="qq-group"></strong
+            ><button id="copy-group" class="button">复制群号</button>
+          </div>
         </section>
       </main>
       <footer>
@@ -85,6 +89,6 @@
     <noscript
       ><p class="notice">购买与查看订单需要启用 JavaScript。</p></noscript
     >
-    <script type="module" src="/src/home.ts"></script>
+    <script type="module" src="/src/contact.ts"></script>
   </body>
 </html>

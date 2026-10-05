@@ -13,7 +13,7 @@
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self' __API_CONNECT_SRC__; object-src 'none'; base-uri 'none'; form-action 'self'"
     />
-    <title>音频插件商店 / Dirty Octopus</title>
+    <title>本设备订单 / Dirty Octopus</title>
     <link rel="icon" href="/assets/dirty-octopus.svg" type="image/svg+xml" />
   </head>
   <body>
@@ -40,42 +40,21 @@
         </nav>
       </header>
       <main id="main">
-        <section class="product-hero" aria-labelledby="product-title">
-          <div class="product-copy">
-            <p class="eyebrow">FREQUENCY DOMAIN / AUDIO PLUGIN</p>
-            <h1 id="product-title">SPECTRAL<br /><span>CORRUPTOR</span></h1>
-            <p class="intro">重塑频谱。<br />让声音偏离预期。</p>
-            <p class="description">
-              来自 Dirty Octopus
-              的模块化频域声音处理插件。探索谐波、频移与频谱破坏，搭建属于你的信号链。
-            </p>
-            <div class="purchase">
-              <span class="price">¥99.90<small>CNY / 人工激活</small></span
-              ><a class="button primary" href="/plugins/spectral-corruptor/"
-                >查看详情与试听 ↗</a
-              >
-            </div>
-            <p class="muted small">微信扫码付款 · QQ / 微信人工交付激活码</p>
+        <section
+          id="recent"
+          class="recent-section"
+          aria-labelledby="recent-title"
+        >
+          <div class="section-title">
+            <h2 id="recent-title">本设备的最近订单</h2>
+            <span class="mono">RECENT ORDERS ON THIS DEVICE</span>
           </div>
-          <figure class="preview">
-            <div class="panel-bar">
-              <span>插件界面预览</span><span>SIGNAL PROCESSOR</span>
-            </div>
-            <a
-              href="/plugins/spectral-corruptor/"
-              rel="noopener"
-              aria-label="查看 Spectral Corruptor 插件详情"
-              ><img
-                src="/assets/spectral-corruptor.png"
-                alt="Spectral Corruptor 的输入输出频谱、模块信号链和频域效果参数界面"
-                width="2360"
-                height="1640"
-                fetchpriority="high"
-            /></a>
-            <figcaption>
-              真实插件界面 <span>点击查看详情与试听 ↗</span>
-            </figcaption>
-          </figure>
+          <p class="muted">
+            订单凭证保存在当前浏览器。清除网站数据或更换设备后，需要使用你备份的访问凭证。
+          </p>
+          <div id="recent-list" class="recent-list" aria-live="polite">
+            正在读取订单…
+          </div>
         </section>
       </main>
       <footer>
@@ -85,6 +64,6 @@
     <noscript
       ><p class="notice">购买与查看订单需要启用 JavaScript。</p></noscript
     >
-    <script type="module" src="/src/home.ts"></script>
+    <script type="module" src="/src/recent.ts"></script>
   </body>
 </html>

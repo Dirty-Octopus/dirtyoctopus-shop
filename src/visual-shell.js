@@ -1,5 +1,7 @@
+import { createInterfaceAudio } from "./interface-audio.js";
+import { initScroll } from "./portfolio/scroll.js";
 // Visual modules and structural artwork are ported from Portfolio4Music.
-// No portfolio playback engine, sound effects or background music is loaded.
+// Selected interaction sounds are shared with the portfolio; no background music.
 import "./portfolio/imports.css";
 import "./shop-visual.css";
 import templates from "./portfolio/templates.json";
@@ -14,13 +16,9 @@ import { initSettings } from "./portfolio/settings.js";
 import { initParallax } from "./portfolio/parallax.js";
 const old = document.querySelector("body > .shell");
 const main = document.querySelector("#main");
-const home = Boolean(document.querySelector("#buy"));
+const home = location.pathname === "/" || location.pathname === "/index.html";
 const admin = Boolean(document.querySelector("#orders"));
-const silent = {
-  sfx() {},
-  unlock: async () => {},
-  context: { state: "running" },
-};
+
 const read = (key, fallback) => {
   try {
     return localStorage.getItem("shop-visual-" + key) ?? fallback;
@@ -49,11 +47,10 @@ if (old && main) {
     document.querySelector("footer").append(logout);
   }
   main.classList.add("commerce");
+  const engine = createInterfaceAudio();
+  document.querySelectorAll("#bgm-toggle").forEach((el) => el.remove());
   document
-    .querySelectorAll("#sfx-toggle,#bgm-toggle")
-    .forEach((el) => el.remove());
-  document
-    .querySelectorAll("#system-sfx,#system-bgm")
+    .querySelectorAll("#system-bgm")
     .forEach((el) => el.closest(".system-switch-row").remove());
   document
     .querySelector("[data-language]")
@@ -73,21 +70,22 @@ if (old && main) {
   document.querySelector(".brand-home").href = admin
     ? "https://shop.dirtyoctopus.net"
     : "/";
+  document.querySelector(".brand-name strong").textContent = "SHOP";
   document.querySelector(".brand-name small").textContent =
     "INDEPENDENT AUDIO TOOLS";
   const nav = document.querySelector(".navigation-block nav");
   nav.innerHTML = [
     ["/", "插件商店", "SHOP"],
-    ["/#demo", "效果试听", "A/B DEMO"],
-    ["/#recent", "本设备订单", "MY ORDERS"],
-    ["/#contact-title", "联系方式", "CONTACT"],
+    ["/orders/", "本设备订单", "MY ORDERS"],
+    ["/contact/", "联系方式", "CONTACT"],
     ["https://dirtyoctopus.net", "作品集 ↗", "PORTFOLIO"],
   ]
     .map(
       ([href, zh, en], i) =>
-        `<a class="nav ${i === 0 ? "active" : ""}" href="${admin && href.startsWith("/") ? "https://shop.dirtyoctopus.net" + href : href}"><span>0${i}</span><b>${zh}</b><small>${en}</small></a>`,
+        `<a class="nav ${(href === "/" ? home || location.pathname.startsWith("/plugins/") : location.pathname.startsWith(href)) ? "active" : ""}" href="${admin && href.startsWith("/") ? "https://shop.dirtyoctopus.net" + href : href}"><span>0${i}</span><b>${zh}</b><small>${en}</small></a>`,
     )
     .join("");
+  nav.querySelector(".active")?.setAttribute("aria-current", "page");
   document.querySelector('[data-icon="sliders-horizontal"]').textContent = "☷";
   const boot = document.querySelector("#boot");
   boot.querySelector("h1").innerHTML =
@@ -97,11 +95,12 @@ if (old && main) {
   boot.querySelector(".portal-caption").textContent =
     "D.O. / INDEPENDENT AUDIO TOOLS";
   boot.querySelector("#enter > span").textContent = "ENTER SHOP";
-  boot.querySelector("#enter-en > span").textContent = "处理前 / 处理后";
+  boot.querySelector("#enter-en").remove();
+  boot.querySelector(".language-entry").classList.add("single-entry");
   boot.querySelector(".boot-note").textContent =
     "探索频域里的声音。试听效果，选择你的声音工具。";
   boot.querySelector(".browser-notice").textContent =
-    "试听由你手动播放，页面没有背景音乐或操作音效。";
+    "非 Chromium 浏览器默认关闭曲面畸变，可在 SYSTEM 中调整。";
   boot.querySelector("#boot-status").textContent = "VISUAL SYSTEM READY";
   boot.querySelector("#boot-percent").textContent = "100%";
   boot
@@ -116,9 +115,9 @@ if (old && main) {
     hero.querySelector(".hero-subtitle").textContent =
       "INDEPENDENT AUDIO PLUGINS";
     hero.querySelector(".hero-sub").textContent = "重塑频谱，让声音偏离预期。";
-    hero.querySelector("#explore").innerHTML =
-      "<b>试听处理前后</b><span>↗</span>";
-    hero.querySelector("#explore").onclick = () => scrollToSection("#demo");
+    hero.querySelector("#explore").innerHTML = "<b>浏览插件</b><span>↗</span>";
+    hero.querySelector("#explore").onclick = () =>
+      scrollToSection("#product-title");
     hero.querySelector(".image-index strong").textContent = "01";
     hero.querySelector(".image-index span").innerHTML = "AUDIO<br>PLUGIN";
     hero.querySelector(".hero-bottom span").textContent =
@@ -184,7 +183,13 @@ if (old && main) {
     soften();
     document.dispatchEvent(new Event("settingsreset"));
   };
+  const ruler = document.createElement("div");
+  ruler.className = "scroll-ruler";
+  ruler.setAttribute("aria-hidden", "true");
+  ruler.innerHTML = "<i></i>";
+  document.body.append(ruler);
   initViewportSurface();
+  initScroll(engine, motionAllowed);
   initCrtLens((zh) => zh);
   initBackground(motionAllowed);
   initNoise(motionAllowed);
@@ -219,13 +224,13 @@ if (old && main) {
     document.body.classList.add("boot-visible");
     document.querySelector("#site").inert = true;
     const portal = initPortal({
-      engine: silent,
+      engine,
       motionAllowed,
       getLogo: () => logo,
     });
-    initPortalContour({ engine: silent, motionAllowed });
+    initPortalContour({ engine, motionAllowed });
     initParallax(motionAllowed);
-    const ready = initMetalLogos({ engine: silent, motionAllowed })
+    const ready = initMetalLogos({ engine, motionAllowed })
       .then((c) => (logo = c))
       .catch(() => {});
     // The entry must remain usable even when WebGL initialization is unavailable.
@@ -236,12 +241,11 @@ if (old && main) {
       (el) =>
         (el.onclick = async () => {
           await portal.enter();
-          if (el.id === "enter-en") scrollToSection("#demo");
         }),
     );
   } else {
     boot.hidden = true;
-    initMetalLogos({ engine: silent, motionAllowed })
+    initMetalLogos({ engine, motionAllowed })
       .then((c) => c?.finishTransfer())
       .catch(() => {});
   }

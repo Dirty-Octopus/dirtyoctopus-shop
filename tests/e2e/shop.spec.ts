@@ -7,7 +7,7 @@ test("生产构建：外部样式、真实联系方式、严格 CSP 与响应式
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await visit(page, "http://127.0.0.1:4183/");
+  await visit(page, "http://127.0.0.1:4183/plugins/spectral-corruptor/");
   await page.evaluate(() => document.fonts.ready);
   const buy = page.getByRole("button", { name: "创建订单并购买" });
   if (siteConfig.apiBase) await expect(buy).toBeEnabled();
@@ -15,9 +15,7 @@ test("生产构建：外部样式、真实联系方式、严格 CSP 与响应式
     await expect(buy).toBeDisabled();
     await expect(page.locator("#setup-notice")).toBeVisible();
   }
-  await expect(page.locator('[data-contact="wechat"]')).toHaveText(
-    siteConfig.wechat,
-  );
+
   expect(
     await page.evaluate(
       () => getComputedStyle(document.documentElement).backgroundColor,
@@ -60,13 +58,13 @@ test("未配置联系方式时阻止购买，实际新付款码与插件图片�
   await page.route("**/site-config.json", (route) =>
     route.fulfill({ json: { qq: "REPLACE_ME", wechat: "REPLACE_ME" } }),
   );
-  await visit(page, "/");
+  await visit(page, "/plugins/spectral-corruptor/");
   await expect(
     page.getByRole("button", { name: "创建订单并购买" }),
   ).toBeDisabled();
   await expect(
     page.getByText(
-      "商店正在准备上线，暂未开放购买。有问题请通过下方 QQ / 微信联系我。",
+      "商店正在准备上线，暂未开放购买。有问题请前往联系方式页，通过 QQ / 微信联系我。",
     ),
   ).toBeVisible();
   const image = page.getByAltText(
@@ -99,7 +97,7 @@ test("真实本地 Worker：创建 → 提交 → 刷新 → 最近订单，不�
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await testContacts(page);
-  await visit(page, "/");
+  await visit(page, "/plugins/spectral-corruptor/");
   await click(page.getByRole("button", { name: "创建订单并购买" }));
   await expect(page).toHaveURL(/\/order\/\?id=DO-[A-F0-9]{16}$/);
   const orderUrl = page.url();
@@ -124,7 +122,7 @@ test("真实本地 Worker：创建 → 提交 → 刷新 → 最近订单，不�
   await expect(page.locator("#order-status")).toHaveText(
     "付款信息已提交，等待人工核验",
   );
-  await visit(page, "/");
+  await visit(page, "/orders/");
   await expect(page.locator(".recent-order")).toHaveCount(1);
   await click(page.locator(".recent-order"));
   await expect(page).toHaveURL(orderUrl);
@@ -135,7 +133,7 @@ test("跨设备需要访问凭证，错误凭证不能查看；备份凭证可�
   browser,
 }) => {
   await testContacts(page);
-  await visit(page, "/");
+  await visit(page, "/plugins/spectral-corruptor/");
   await click(page.getByRole("button", { name: "创建订单并购买" }));
   await expect(page.locator("#order-status")).toHaveText("等待付款");
   const url = page.url();
@@ -164,7 +162,7 @@ test("手机 390px 与 320px 不横向溢出，最近订单中的恶意存储不
 }) => {
   for (const width of [390, 320]) {
     await page.setViewportSize({ width, height: 844 });
-    await visit(page, "/");
+    await visit(page, "/plugins/spectral-corruptor/");
     await expect(page.locator("#product-title")).toBeVisible();
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth > innerWidth,
@@ -180,12 +178,13 @@ test("手机 390px 与 320px 不横向溢出，最近订单中的恶意存储不
       }),
     ),
   );
-  await page.reload();
+  await page.goto("/orders/");
+  await expect(page.locator("#recent-list")).toBeVisible();
   await expect(page.locator("#recent-list img")).toHaveCount(0);
 });
 test("订单手机布局及输入错误处理", async ({ page }) => {
   await testContacts(page);
-  await visit(page, "/");
+  await visit(page, "/plugins/spectral-corruptor/");
   await click(page.getByRole("button", { name: "创建订单并购买" }));
   await expect(page.locator("#order-status")).toHaveText("等待付款");
   for (const width of [390, 320]) {
@@ -271,6 +270,7 @@ test("管理 UI：展示备注为文本、人工确认弹窗、核验后再完�
 
 async function visit(page: Page, url: string) {
   await page.goto(url);
-  await page.locator("#enter").click();
+  if (new URL(page.url()).pathname === "/")
+    await page.locator("#enter").click();
   await expect(page.locator("#boot")).toBeHidden({ timeout: 10000 });
 }

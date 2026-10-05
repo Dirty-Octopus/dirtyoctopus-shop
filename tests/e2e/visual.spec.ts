@@ -25,8 +25,9 @@ test("主站视觉：严格 CSP、真实 A/B 播放、保留位置与独立设�
   await expect(page.locator("#boot")).toBeHidden({ timeout: 10000 });
   await expect(page.locator("html")).toHaveClass(/crt-mode/);
   await page.screenshot({ path: "/tmp/shop-home.png" });
-  await expect(page.locator("#qq-group")).toHaveText("974329105");
-  await expect(page.locator("[data-community]")).toContainText("私聊发送");
+  await expect(page.locator("#demo")).toHaveCount(0);
+  await visualClick(page.locator(".preview a"));
+  await expect(page).toHaveURL(/plugins\/spectral-corruptor\//);
   const audio = page.locator("#demo-audio");
   expect(await audio.evaluate((el) => (el as HTMLAudioElement).paused)).toBe(
     true,
@@ -76,7 +77,11 @@ test("主站视觉：严格 CSP、真实 A/B 播放、保留位置与独立设�
   await expect(page.locator("#system-dialog")).not.toBeVisible();
   expect(audioRequests.length).toBeGreaterThanOrEqual(2);
   expect(
-    audioRequests.every((url) => url.includes("/assets/audio/glossy-neuro-")),
+    audioRequests.every(
+      (url) =>
+        url.includes("/assets/audio/glossy-neuro-") ||
+        url.includes("/assets/sfx/"),
+    ),
   ).toBe(true);
   expect(errors).toEqual([]);
 });
@@ -84,12 +89,13 @@ test("移动端与减少动态效果，进入试听后不横向溢出", async ({
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("http://127.0.0.1:4183/");
-  await page.locator("#enter-en").click();
+  await page.locator("#enter").click();
   await expect(page.locator("#boot")).toBeHidden();
   await expect(page.locator("body")).toHaveClass(/motion-off/);
   expect(await page.locator("html").getAttribute("class")).not.toContain(
     "crt-mode",
   );
+  await visualClick(page.locator(".preview a"));
   await bring(page.locator("#demo-play"));
   await page.screenshot({ path: "/tmp/shop-mobile.png" });
   expect(

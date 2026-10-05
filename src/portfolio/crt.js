@@ -75,7 +75,11 @@ export function initCrtLens(t) {
   const active = () => enabled && !document.fullscreenElement;
   // Portal, chrome object and archive share the same optical surface.
   const inputActive = active;
+  const chromium =
+    /(?:Chrome|Chromium|Edg|OPR)\//.test(navigator.userAgent) &&
+    !/iPhone|iPad|iPod/.test(navigator.userAgent);
   const defaultEnabled = () =>
+    chromium &&
     !matchMedia("(max-width: 640px), (hover: none) and (pointer: coarse)")
       .matches;
   const interactive = "button,a,input,textarea,select,[role=slider],video";

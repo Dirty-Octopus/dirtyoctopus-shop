@@ -231,3 +231,10 @@ footer {
     margin-top: 20px;
   }
 }
+
+.language-entry.single-entry {
+  grid-template-columns: 1fr;
+}
+.brand-name strong {
+  white-space: nowrap;
+}

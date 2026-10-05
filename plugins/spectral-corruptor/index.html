@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#101112" />
+    <meta name="referrer" content="no-referrer" />
+    <meta
+      name="description"
+      content="Dirty Octopus 独立音频插件商店。Spectral Corruptor，探索频域里的声音。微信付款，人工核验与激活。"
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self' __API_CONNECT_SRC__; object-src 'none'; base-uri 'none'; form-action 'self'"
+    />
+    <title>Spectral Corruptor / Dirty Octopus</title>
+    <link rel="icon" href="/assets/dirty-octopus.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <a class="skip" href="#main">跳到主要内容</a>
+    <div class="shell">
+      <header class="masthead">
+        <a class="brand" href="/" aria-label="Dirty Octopus 商店首页"
+          ><img
+            src="/assets/dirty-octopus.svg"
+            alt=""
+            width="70"
+            height="52"
+          /><span
+            >DIRTY OCTOPUS<small>独立音频插件 / AUDIO TOOLS</small></span
+          ></a
+        >
+        <nav aria-label="主导航">
+          <a class="nav active" href="/" aria-current="page"
+            >插件商店<span>SHOP</span></a
+          ><a class="nav" href="#recent">本设备订单<span>MY ORDERS</span></a
+          ><a class="nav" href="https://dirtyoctopus.net"
+            >作品集 ↗<span>PORTFOLIO</span></a
+          >
+        </nav>
+      </header>
+      <main id="main">
+        <section class="product-hero" aria-labelledby="product-title">
+          <div class="product-copy">
+            <p class="eyebrow">FREQUENCY DOMAIN / AUDIO PLUGIN</p>
+            <h1 id="product-title">SPECTRAL<br /><span>CORRUPTOR</span></h1>
+            <p class="intro">重塑频谱。<br />让声音偏离预期。</p>
+            <p class="description">
+              来自 Dirty Octopus
+              的模块化频域声音处理插件。探索谐波、频移与频谱破坏，搭建属于你的信号链。
+            </p>
+            <div class="purchase">
+              <span class="price">¥99.90<small>CNY / 人工激活</small></span
+              ><button id="buy" class="button primary" disabled>
+                创建订单并购买 <span aria-hidden="true">↗</span>
+              </button>
+            </div>
+            <p class="muted small">微信扫码付款 · QQ / 微信人工交付激活码</p>
+          </div>
+          <figure class="preview">
+            <div class="panel-bar">
+              <span>插件界面预览</span><span>SIGNAL PROCESSOR</span>
+            </div>
+            <a
+              href="/assets/spectral-corruptor.png"
+              target="_blank"
+              rel="noopener"
+              aria-label="查看 Spectral Corruptor 插件界面大图"
+              ><img
+                src="/assets/spectral-corruptor.png"
+                alt="Spectral Corruptor 的输入输出频谱、模块信号链和频域效果参数界面"
+                width="2360"
+                height="1640"
+                fetchpriority="high"
+            /></a>
+            <figcaption>真实插件界面 <span>点击查看大图 ↗</span></figcaption>
+          </figure>
+        </section>
+        <div
+          id="message"
+          class="notice"
+          role="status"
+          aria-live="polite"
+          hidden
+        ></div>
+        <p id="setup-notice" class="notice" hidden>
+          商店正在准备上线，暂未开放购买。有问题请前往联系方式页，通过 QQ /
+          微信联系我。
+        </p>
+        <section id="recovery-backup" class="panel" hidden>
+          <h2>请先保存订单访问凭证</h2>
+          <p id="backup-id" class="mono"></p>
+          <label for="backup-token">仅自己保管，不要发给其他人</label
+          ><input id="backup-token" readonly />
+          <div class="actions">
+            <button id="copy-backup" class="button">复制访问凭证</button
+            ><a id="backup-order-link" class="button" href="/order/"
+              >打开订单</a
+            >
+          </div>
+        </section>
+        <section id="demo" class="audio-demo" aria-labelledby="demo-title">
+          <div class="demo-heading">
+            <div>
+              <p>PROCESSING COMPARISON / 01</p>
+              <h2 id="demo-title">NEURO SQUARIFIER</h2>
+            </div>
+            <p>
+              Glossy Neuro · 同一片段，处理前后对比<br />切换时保留播放位置，不作响度归一化。
+            </p>
+          </div>
+          <div class="demo-switch" role="group" aria-label="处理版本">
+            <button data-demo="before" aria-pressed="true">A / 处理前</button
+            ><button data-demo="after" aria-pressed="false">B / 处理后</button>
+          </div>
+          <canvas id="demo-wave" class="demo-wave" aria-hidden="true"></canvas>
+          <input
+            id="demo-seek"
+            class="demo-seek"
+            type="range"
+            min="0"
+            max="100"
+            step="0.1"
+            value="0"
+            aria-label="试听进度"
+          />
+          <div class="demo-controls">
+            <button id="demo-play" class="button primary">播放试听 ▶</button
+            ><button id="demo-loop" class="button" aria-pressed="true">
+              循环：开</button
+            ><span id="demo-time" class="demo-time">0:00 / 0:00</span
+            ><label for="demo-volume">音量</label
+            ><input
+              id="demo-volume"
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value="0.65"
+              aria-label="试听音量"
+            />
+          </div>
+          <p id="demo-status" role="status"></p>
+        </section>
+        <section class="how-section" aria-labelledby="how-title">
+          <div class="section-title">
+            <h2 id="how-title">购买后，如何激活？</h2>
+            <span class="mono">人工核验 / MANUAL DELIVERY</span>
+          </div>
+          <ol class="process-strip">
+            <li>
+              <b>01</b>
+              <div>
+                <h3>扫码付款</h3>
+                <p>创建订单，使用微信支付 ¥99.90。</p>
+              </div>
+            </li>
+            <li>
+              <b>02</b>
+              <div>
+                <h3>提交交易单号</h3>
+                <p>从微信账单复制交易单号，粘贴到订单页。</p>
+              </div>
+            </li>
+            <li>
+              <b>03</b>
+              <div>
+                <h3>联系我完成激活</h3>
+                <p>通过 QQ / 微信发送订单号、付款截图和 Machine ID。</p>
+              </div>
+            </li>
+          </ol>
+          <p class="flow-note">
+            提交交易单号后，我会人工核对付款，再通过 QQ / 微信发送 Activation
+            Code。请勿重复付款。
+          </p>
+        </section>
+      </main>
+      <footer>
+        <span>DIRTY OCTOPUS / AUDIO TOOLS</span><a href="/admin/">订单管理 ↗</a>
+      </footer>
+    </div>
+    <noscript
+      ><p class="notice">购买与查看订单需要启用 JavaScript。</p></noscript
+    >
+    <script type="module" src="/src/product.ts"></script>
+  </body>
+</html>

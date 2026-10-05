@@ -55,6 +55,9 @@ export default defineConfig(({ command, mode }) => {
         input: [
           "index.html",
           "order/index.html",
+          "orders/index.html",
+          "contact/index.html",
+          "plugins/spectral-corruptor/index.html",
           "admin/index.html",
           "console/index.html",
         ],
