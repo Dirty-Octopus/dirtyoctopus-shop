@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#101112" />
+    <meta name="referrer" content="no-referrer" />
+    <meta
+      name="description"
+      content="Dirty Octopus 独立音频插件商店。Spectral Corruptor，探索频域里的声音。微信付款，人工核验与激活。"
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self' https://api.dirtyoctopus.net http://127.0.0.1:8787 http://localhost:8787 ws://127.0.0.1:* ws://localhost:*; object-src 'none'; base-uri 'none'; form-action 'self'"
+    />
+    <title>音频插件商店 / Dirty Octopus</title>
+    <link rel="icon" href="/assets/dirty-octopus.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <a class="skip" href="#main">跳到主要内容</a>
+    <div class="shell">
+      <header class="masthead">
+        <a class="brand" href="/" aria-label="Dirty Octopus 商店首页"
+          ><img
+            src="/assets/dirty-octopus.svg"
+            alt=""
+            width="70"
+            height="52"
+          /><span
+            >DIRTY OCTOPUS<small>独立音频插件 / AUDIO TOOLS</small></span
+          ></a
+        >
+        <nav aria-label="主导航">
+          <a class="nav active" href="/" aria-current="page"
+            >插件商店<span>SHOP</span></a
+          ><a class="nav" href="#recent">本设备订单<span>MY ORDERS</span></a
+          ><a class="nav" href="https://dirtyoctopus.net"
+            >作品集 ↗<span>PORTFOLIO</span></a
+          >
+        </nav>
+      </header>
+      <main id="main">
+        <section class="product-hero" aria-labelledby="product-title">
+          <div class="product-copy">
+            <p class="eyebrow">FREQUENCY DOMAIN / AUDIO PLUGIN</p>
+            <h1 id="product-title">SPECTRAL<br /><span>CORRUPTOR</span></h1>
+            <p class="intro">重塑频谱。<br />让声音偏离预期。</p>
+            <p class="description">
+              来自 Dirty Octopus
+              的模块化频域声音处理插件。探索谐波、频移与频谱破坏，搭建属于你的信号链。
+            </p>
+            <div class="purchase">
+              <span class="price">¥99.90<small>CNY / 人工激活</small></span
+              ><button id="buy" class="button primary" disabled>
+                创建订单并购买 <span aria-hidden="true">↗</span>
+              </button>
+            </div>
+            <p class="muted small">微信扫码付款 · QQ / 微信人工交付激活码</p>
+          </div>
+          <figure class="preview">
+            <div class="panel-bar">
+              <span>插件界面预览</span><span>SIGNAL PROCESSOR</span>
+            </div>
+            <a
+              href="/assets/spectral-corruptor.png"
+              target="_blank"
+              rel="noopener"
+              aria-label="查看 Spectral Corruptor 插件界面大图"
+              ><img
+                src="/assets/spectral-corruptor.png"
+                alt="Spectral Corruptor 的输入输出频谱、模块信号链和频域效果参数界面"
+                width="1180"
+                height="820"
+                fetchpriority="high"
+            /></a>
+            <figcaption>真实插件界面 <span>点击查看大图 ↗</span></figcaption>
+          </figure>
+        </section>
+        <div
+          id="message"
+          class="notice"
+          role="status"
+          aria-live="polite"
+          hidden
+        ></div>
+        <p id="setup-notice" class="notice" hidden>
+          商店正在准备上线，联系方式尚未填写，暂未开放购买。
+        </p>
+        <section id="recovery-backup" class="panel" hidden>
+          <h2>请先保存订单访问凭证</h2>
+          <p id="backup-id" class="mono"></p>
+          <label for="backup-token">仅自己保管，不要发给其他人</label
+          ><input id="backup-token" readonly />
+          <div class="actions">
+            <button id="copy-backup" class="button">复制访问凭证</button
+            ><a id="backup-order-link" class="button" href="/order/"
+              >打开订单</a
+            >
+          </div>
+        </section>
+        <section class="how-section" aria-labelledby="how-title">
+          <div class="section-title">
+            <h2 id="how-title">购买后，如何激活？</h2>
+            <span class="mono">人工核验 / MANUAL DELIVERY</span>
+          </div>
+          <ol class="process-strip">
+            <li>
+              <b>01</b>
+              <div>
+                <h3>扫码付款</h3>
+                <p>创建订单，使用微信支付 ¥99.90。</p>
+              </div>
+            </li>
+            <li>
+              <b>02</b>
+              <div>
+                <h3>提交交易单号</h3>
+                <p>从微信账单复制交易单号，粘贴到订单页。</p>
+              </div>
+            </li>
+            <li>
+              <b>03</b>
+              <div>
+                <h3>联系我完成激活</h3>
+                <p>通过 QQ / 微信发送订单号、付款截图和 Machine ID。</p>
+              </div>
+            </li>
+          </ol>
+          <p class="flow-note">
+            提交交易单号后，我会人工核对付款，再通过 QQ / 微信发送 Activation
+            Code。请勿重复付款。
+          </p>
+        </section>
+        <section
+          id="recent"
+          class="recent-section"
+          aria-labelledby="recent-title"
+        >
+          <div class="section-title">
+            <h2 id="recent-title">本设备的最近订单</h2>
+            <span class="mono">RECENT ORDERS ON THIS DEVICE</span>
+          </div>
+          <p class="muted">
+            订单凭证保存在当前浏览器。清除网站数据或更换设备后，需要使用你备份的访问凭证。
+          </p>
+          <div id="recent-list" class="recent-list" aria-live="polite">
+            正在读取订单…
+          </div>
+        </section>
+        <section class="contact-section" aria-labelledby="contact-title">
+          <div>
+            <h2 id="contact-title">有问题，直接联系我。</h2>
+            <p class="muted">
+              购买前可确认插件兼容性；付款后请带上商店订单号。
+            </p>
+          </div>
+          <dl class="contacts">
+            <div>
+              <dt>QQ</dt>
+              <dd data-contact="qq">REPLACE_ME</dd>
+            </div>
+            <div>
+              <dt>微信</dt>
+              <dd data-contact="wechat">REPLACE_ME</dd>
+            </div>
+          </dl>
+        </section>
+      </main>
+      <footer>
+        <span>DIRTY OCTOPUS / AUDIO TOOLS</span><a href="/admin/">订单管理 ↗</a>
+      </footer>
+    </div>
+    <noscript
+      ><p class="notice">购买与查看订单需要启用 JavaScript。</p></noscript
+    >
+    <script type="module" src="/src/home.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="referrer" content="no-referrer" />
+    <title>订单管理 / Dirty Octopus</title>
+  </head>
+  <body>
+    <a class="skip" href="#main">跳到主要内容</a>
+    <div class="shell admin-shell">
+      <header class="masthead">
+        <a class="brand" href="https://shop.dirtyoctopus.net"
+          ><img
+            src="/assets/dirty-octopus.svg"
+            alt=""
+            width="70"
+            height="52"
+          /><span>DIRTY OCTOPUS<small>订单管理 / ADMIN</small></span></a
+        ><a class="button" href="/cdn-cgi/access/logout">退出登录</a>
+      </header>
+      <main id="main">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">ORDER MANAGEMENT</p>
+            <h1>人工核验与交付</h1>
+          </div>
+          <button id="reload" class="button">刷新列表</button>
+        </div>
+        <p class="muted">
+          提交交易单号不等于付款成功。核对微信账单后标记已核验；通过 QQ /
+          微信发送激活码后再标记完成。
+        </p>
+        <div
+          id="message"
+          class="notice"
+          role="status"
+          aria-live="polite"
+          hidden
+        ></div>
+        <form id="find-form" class="search-form">
+          <label for="find-id">按订单号查看</label>
+          <div class="actions">
+            <input
+              id="find-id"
+              placeholder="DO-…"
+              maxlength="19"
+              required
+            /><button id="find-button" class="button" type="submit">
+              查看订单
+            </button>
+          </div>
+        </form>
+        <div class="table-scroll">
+          <table>
+            <caption>
+              订单列表（时间为北京时间）
+            </caption>
+            <thead>
+              <tr>
+                <th>订单号 / 商品</th>
+                <th>金额</th>
+                <th>状态</th>
+                <th>微信交易单号</th>
+                <th>创建时间</th>
+                <th>提交时间</th>
+              </tr>
+            </thead>
+            <tbody id="orders"></tbody>
+          </table>
+        </div>
+        <p id="empty" class="muted" hidden>尚无订单。</p>
+        <button id="load-more" class="button" hidden>加载更多</button>
+        <section
+          id="admin-detail"
+          class="panel admin-detail"
+          hidden
+          aria-labelledby="detail-title"
+        >
+          <div class="section-title">
+            <h2 id="detail-title">订单详情</h2>
+            <button id="close-detail" class="button">收起</button>
+          </div>
+          <p id="detail-status" class="status"></p>
+          <dl id="detail-data" class="details-grid"></dl>
+          <div id="admin-actions" class="actions">
+            <button data-action="verify-payment" class="button primary">
+              标记付款已核验</button
+            ><button data-action="complete" class="button primary">
+              标记已完成</button
+            ><button data-action="cancel" class="button danger">取消订单</button
+            ><button data-action="refund" class="button danger">
+              标记已退款
+            </button>
+          </div>
+          <p class="muted small">
+            退款按钮只记录你已在微信中完成的退款，不会发起退款。
+          </p>
+          <form id="note-form">
+            <label for="admin-note">管理员备注（仅管理员可见）</label
+            ><textarea
+              id="admin-note"
+              maxlength="2000"
+              rows="4"
+              placeholder="记录核验、联系或交付情况，不要粘贴激活码或 Machine ID。"
+            ></textarea
+            ><button id="save-note" class="button" type="submit">
+              保存备注
+            </button>
+          </form>
+        </section>
+        <dialog id="confirm-dialog">
+          <form method="dialog">
+            <h2>确认更新订单</h2>
+            <p id="confirm-order-id" class="mono"></p>
+            <p id="confirm-description"></p>
+            <div class="actions">
+              <button class="button" value="cancel">返回</button
+              ><button
+                id="confirm-action"
+                class="button primary"
+                value="confirm"
+              >
+                确认已完成此人工操作
+              </button>
+            </div>
+          </form>
+        </dialog>
+      </main>
+      <footer>
+        <span>DIRTY OCTOPUS / MANUAL DELIVERY</span
+        ><a href="https://shop.dirtyoctopus.net">打开商店 ↗</a>
+      </footer>
+    </div>
+    <script type="module" src="/src/admin.ts"></script>
+  </body>
+</html>

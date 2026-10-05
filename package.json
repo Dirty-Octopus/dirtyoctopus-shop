@@ -1,0 +1,40 @@
+{
+  "name": "dirtyoctopus-shop",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "dev:api": "wrangler dev --config wrangler.local.jsonc --ip 127.0.0.1",
+    "build": "vite build && node scripts/build-worker-assets.mjs",
+    "preview": "vite preview --host 127.0.0.1",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.worker.json --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "check": "npm run typecheck && npm test && npm run build",
+    "db:local": "wrangler d1 migrations apply dirtyoctopus-shop --local --config wrangler.local.jsonc",
+    "db:remote": "wrangler d1 migrations apply dirtyoctopus-shop --remote",
+    "deploy:worker": "npm run build && wrangler deploy",
+    "check:launch": "node scripts/check-launch.mjs"
+  },
+  "dependencies": {
+    "@fontsource/barlow-condensed": "5.3.0",
+    "@fontsource/ibm-plex-mono": "5.3.0",
+    "jose": "6.2.12"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20261005.1",
+    "@playwright/test": "1.63.0",
+    "@types/node": "26.6.4",
+    "jsonc-parser": "3.3.1",
+    "miniflare": "5.20261001.0-alpha",
+    "prettier": "3.9.9",
+    "typescript": "7.0.2",
+    "vite": "8.3.2",
+    "vitest": "5.0.3",
+    "wrangler": "4.147.0"
+  }
+}

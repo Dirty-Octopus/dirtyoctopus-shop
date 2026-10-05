@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#101112" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self' https://api.dirtyoctopus.net http://127.0.0.1:8787 http://localhost:8787 ws://127.0.0.1:* ws://localhost:*; object-src 'none'; base-uri 'none'; form-action 'self'"
+    />
+    <title>我的订单 / Dirty Octopus</title>
+    <link rel="icon" href="/assets/dirty-octopus.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <a class="skip" href="#main">跳到主要内容</a>
+    <div class="shell">
+      <header class="masthead">
+        <a class="brand" href="/"
+          ><img
+            src="/assets/dirty-octopus.svg"
+            alt=""
+            width="70"
+            height="52"
+          /><span
+            >DIRTY OCTOPUS<small>独立音频插件 / AUDIO TOOLS</small></span
+          ></a
+        >
+        <nav aria-label="主导航">
+          <a class="nav" href="/">返回商店<span>SHOP</span></a
+          ><a class="nav active" href="/#recent"
+            >本设备订单<span>MY ORDERS</span></a
+          >
+        </nav>
+      </header>
+      <main id="main" class="order-main">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">YOUR ORDER</p>
+            <h1>付款与激活</h1>
+            <p id="order-id" class="mono">读取订单中…</p>
+          </div>
+          <button class="button" id="copy-id">复制订单号</button>
+        </div>
+        <div
+          id="message"
+          class="notice"
+          role="status"
+          aria-live="polite"
+          hidden
+        ></div>
+        <section id="restore-section" class="panel" hidden>
+          <h2>此浏览器没有这笔订单的访问凭证</h2>
+          <p>
+            请在创建订单时使用的浏览器打开，或粘贴你备份的访问凭证。只有订单号无法查看订单。
+          </p>
+          <form id="restore-form">
+            <label for="restore-token"
+              >Customer Access Token / 订单访问凭证</label
+            ><input
+              id="restore-token"
+              type="password"
+              autocomplete="off"
+              maxlength="43"
+              required
+            /><button id="restore-button" class="button primary" type="submit">
+              打开订单
+            </button>
+          </form>
+          <p class="muted">
+            如果没有备份，请通过商店首页的 QQ / 微信联系开发者人工处理。
+          </p>
+        </section>
+        <div id="order-content" hidden>
+          <ol class="order-progress" aria-label="处理流程">
+            <li data-step="1">1. 付款与提交</li>
+            <li data-step="2">2. 联系开发者</li>
+            <li data-step="3">3. 人工交付</li>
+            <li data-step="4">4. 完成</li>
+          </ol>
+          <section class="order-summary panel">
+            <div class="summary-top">
+              <div>
+                <p class="muted small">当前状态</p>
+                <h2 id="order-status" class="status"></h2>
+              </div>
+              <button id="refresh-order" class="button">刷新状态</button>
+            </div>
+            <dl id="order-details" class="details-grid"></dl>
+            <p class="muted small">
+              已提交的微信交易单号：<span
+                id="recorded-reference"
+                class="mono"
+              ></span>
+            </p>
+            <p id="last-updated" class="muted small"></p>
+          </section>
+          <div id="submitted-notice" class="notice" hidden>
+            <strong>付款信息已提交，等待人工核验。</strong
+            ><br />这不代表付款已经确认。请继续通过 QQ / 微信发送付款截图和
+            Machine ID，不要再次扫码支付。
+          </div>
+          <div id="cancel-notice" class="notice" hidden>
+            此订单已取消，请勿付款。如果你已经付款，请联系开发者人工处理。
+          </div>
+          <div id="refund-notice" class="notice" hidden>
+            开发者已将此订单标记为人工退款完成。若有疑问，请通过 QQ /
+            微信联系开发者核对。
+          </div>
+          <section id="payment-section" class="payment-grid">
+            <div id="qr-panel" class="qr-panel panel">
+              <h2>01 / 微信扫码付款</h2>
+              <p>
+                请核对金额
+                <strong id="order-amount" class="amount">¥99.90</strong>
+              </p>
+              <a href="/assets/newpaymentwx.jpg" target="_blank" rel="noopener"
+                ><img
+                  class="qr"
+                  src="/assets/newpaymentwx.jpg"
+                  alt="Dirty Octopus 微信收款码，应付金额 ¥99.90"
+                  width="780"
+                  height="440"
+              /></a>
+              <p class="muted small">
+                点击图片可查看原图。手机上可保存图片后，在微信中识别付款码。
+              </p>
+            </div>
+            <div class="panel payment-form-panel">
+              <h2>02 / 提交微信支付交易单号</h2>
+              <ol class="instruction-list">
+                <li>使用微信扫描二维码支付 <strong>¥99.90</strong>。</li>
+                <li>
+                  支付完成后，打开微信支付账单，复制“<strong>微信支付交易单号</strong>”。
+                </li>
+                <li>将交易单号粘贴到下面并提交。</li>
+              </ol>
+              <form id="reference-form">
+                <label for="transaction-id">微信支付交易单号</label
+                ><input
+                  id="transaction-id"
+                  name="wechat_transaction_id"
+                  autocomplete="off"
+                  minlength="10"
+                  maxlength="128"
+                  required
+                  aria-describedby="reference-help"
+                  placeholder="从微信支付账单中完整复制"
+                />
+                <p id="reference-help" class="muted small">
+                  填写微信账单中的交易单号，不是上方的 DO- 商店订单号。
+                </p>
+                <button
+                  id="submit-reference"
+                  class="button primary"
+                  type="submit"
+                >
+                  提交付款信息
+                </button>
+              </form>
+              <p class="muted small">
+                提交后进入人工核验，不会自动确认付款。网站不接收付款截图。
+              </p>
+            </div>
+          </section>
+          <section id="after-submission" class="panel handoff" hidden>
+            <div class="panel-bar">
+              <span>下一步 / 联系开发者</span><span>MANUAL VERIFICATION</span>
+            </div>
+            <div class="handoff-body">
+              <h2>03 / 把这三项发给我</h2>
+              <p>提交后添加我的 QQ / 微信，再发送：</p>
+              <ol class="instruction-list">
+                <li><strong>商店订单号</strong>（可用下方按钮复制）</li>
+                <li><strong>微信付款截图</strong>（直接发到 QQ / 微信）</li>
+                <li><strong>Machine ID</strong>（从插件中复制，直接发给我）</li>
+              </ol>
+              <button id="copy-handoff" class="button primary">
+                复制联系内容
+              </button>
+              <p>
+                我核对付款后，会通过 QQ / 微信人工发送
+                <strong>Activation Code</strong>。网站不收集 Machine
+                ID，也不保存或发送激活码。
+              </p>
+            </div>
+          </section>
+          <section class="contact-section">
+            <div>
+              <h2>联系 Dirty Octopus</h2>
+              <p class="muted">
+                发送商店订单号即可核对，请不要发送订单访问凭证。
+              </p>
+              <p id="contacts-unavailable" class="notice" hidden>
+                联系方式暂未配置或加载失败，请稍后再付款。
+              </p>
+            </div>
+            <dl class="contacts">
+              <div>
+                <dt>QQ</dt>
+                <dd data-contact="qq">REPLACE_ME</dd>
+              </div>
+              <div>
+                <dt>微信</dt>
+                <dd data-contact="wechat">REPLACE_ME</dd>
+              </div>
+            </dl>
+          </section>
+          <details class="backup-section">
+            <summary>备份订单访问凭证</summary>
+            <p>
+              仅用于你自己查看订单。订单链接不包含凭证；更换浏览器时可手动恢复。请妥善保管，不要发给其他人。
+            </p>
+            <label for="access-token">订单访问凭证</label
+            ><input
+              id="access-token"
+              type="password"
+              readonly
+              autocomplete="off"
+            /><button id="copy-token" class="button">复制访问凭证</button>
+          </details>
+        </div>
+      </main>
+      <footer>
+        <span>DIRTY OCTOPUS / AUDIO TOOLS</span><a href="/">返回商店</a>
+      </footer>
+    </div>
+    <noscript><p class="notice">查看订单需要启用 JavaScript。</p></noscript>
+    <script type="module" src="/src/order.ts"></script>
+  </body>
+</html>

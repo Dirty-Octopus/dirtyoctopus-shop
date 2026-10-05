@@ -1,0 +1,16 @@
+node_modules/
+dist/
+dist-worker/
+.wrangler/
+.dev.vars*
+.env*
+!.env.example
+playwright-report/
+test-results/
+coverage/
+backups/
+*.sql.gz
+.DS_Store
+/SpectralCorrupterPreview.png
+/WeixinPayCode.png
+/newpaymentwx.jpg
