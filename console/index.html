@@ -21,6 +21,10 @@
         ><a class="button" href="/cdn-cgi/access/logout">退出登录</a>
       </header>
       <main id="main">
+        <nav class="actions" aria-label="后台管理">
+          <a href="/admin/" class="button">订单管理</a
+          ><a href="/admin/content/" class="button">支持者与文字管理</a>
+        </nav>
         <div class="page-heading">
           <div>
             <p class="eyebrow">ORDER MANAGEMENT</p>
@@ -50,6 +54,33 @@
             /><button id="find-button" class="button" type="submit">
               查看订单
             </button>
+          </div>
+        </form>
+        <form id="filter-form" class="panel">
+          <div class="actions">
+            <label
+              >订单号前缀<input
+                id="filter-id"
+                maxlength="19"
+                placeholder="DO-…" /></label
+            ><label
+              >状态<select id="filter-status">
+                <option value="">全部状态</option>
+              </select></label
+            ><label
+              >排序<select id="filter-sort">
+                <option value="newest">创建时间：最新优先</option>
+                <option value="oldest">创建时间：最早优先</option>
+                <option value="id_asc">订单号：升序</option>
+                <option value="id_desc">订单号：降序</option>
+              </select></label
+            ><label
+              >归档<select id="filter-archive">
+                <option value="active">未归档</option>
+                <option value="archived">已归档</option>
+                <option value="all">全部</option>
+              </select></label
+            ><button id="apply-filters" class="button">应用筛选</button>
           </div>
         </form>
         <div class="table-scroll">
@@ -96,6 +127,10 @@
           </div>
           <p class="muted small">
             退款按钮只记录你已在微信中完成的退款，不会发起退款。
+          </p>
+          <button id="archive-order" class="button">归档订单</button>
+          <p class="muted small">
+            归档只改变列表可见性，不删除订单，也不改变付款状态。
           </p>
           <form id="note-form">
             <label for="admin-note">管理员备注（仅管理员可见）</label

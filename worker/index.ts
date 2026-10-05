@@ -1,5 +1,8 @@
+import { SALE_START, SALE_START_MS } from "../shared/launch";
+import { publicContent, adminContent } from "./content";
 import type { D1Database, RateLimit } from "@cloudflare/workers-types";
 import {
+  statuses,
   products,
   orderIdPattern,
   tokenPattern,
@@ -29,6 +32,7 @@ export interface Env {
 interface OrderRow extends Omit<CustomerOrder, "product_name"> {
   customer_access_token_hash: string;
   admin_note: string;
+  archived_at: string | null;
 }
 const SHOP_ORIGIN = "https://shop.dirtyoctopus.net";
 const localHosts = new Set(["localhost", "127.0.0.1", "[::1]"]);
@@ -75,7 +79,25 @@ function customerOrder(row: OrderRow): CustomerOrder {
   };
 }
 function adminOrder(row: OrderRow) {
-  return { ...customerOrder(row), admin_note: row.admin_note };
+  return {
+    ...customerOrder(row),
+    admin_note: row.admin_note,
+    archived_at: row.archived_at,
+  };
+}
+async function expireOrders(env: Env) {
+  const now = new Date().toISOString();
+  await env.DB.prepare(
+    "UPDATE orders SET status = ?, expired_at = ?, updated_at = ? WHERE status = ? AND created_at <= ?",
+  )
+    .bind(
+      "EXPIRED",
+      now,
+      now,
+      "PENDING_PAYMENT",
+      new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+    )
+    .run();
 }
 async function findOrder(env: Env, id: string) {
   const row = await env.DB.prepare("SELECT * FROM orders WHERE id = ?")
@@ -100,6 +122,11 @@ async function authorizeCustomer(request: Request, env: Env, id: string) {
   return row;
 }
 async function createOrder(request: Request, env: Env) {
+  if (!isLocal(request, env) && Date.now() < SALE_START_MS)
+    throw new HttpError(
+      403,
+      "敬请等待，北京时间 2026 年 10 月 6 日 21:09:09 开售。",
+    );
   const body = await readJson(request);
   onlyFields(body, ["product_id"]);
   if (
@@ -244,30 +271,64 @@ async function adminRoute(request: Request, env: Env, path: string) {
       throw new HttpError(403, "管理员操作必须来自同源管理页面。");
     }
   }
+  const content = await adminContent(request, env, path);
+  if (content) return content;
   if (path === "/api/admin/orders" && request.method === "GET") {
     const params = new URL(request.url).searchParams;
+    const q = (params.get("q") ?? "").trim().toUpperCase();
+    const status = params.get("status") ?? "";
+    const sorts = {
+      newest: ["created_at", "DESC"],
+      oldest: ["created_at", "ASC"],
+      id_asc: ["id", "ASC"],
+      id_desc: ["id", "DESC"],
+    } as const;
+    const sort = params.get("sort") ?? "newest";
+    const archive = params.get("archive") ?? "active";
+    if (!["active", "archived", "all"].includes(archive))
+      throw new HttpError(400, "归档筛选无效。");
+    if (
+      !/^[A-Z0-9-]{0,19}$/.test(q) ||
+      (status && !statuses.includes(status as OrderStatus)) ||
+      !Object.hasOwn(sorts, sort)
+    )
+      throw new HttpError(400, "筛选或排序参数无效。");
+    const [column, direction] = sorts[sort as keyof typeof sorts];
+    const conditions = ["id LIKE ?", "(? = '' OR status = ?)"];
+    if (archive !== "all")
+      conditions.push(
+        archive === "archived"
+          ? "archived_at IS NOT NULL"
+          : "archived_at IS NULL",
+      );
+    const values: (string | number)[] = [q + "%", status, status];
     const cursor = params.get("cursor");
-    let created = "",
-      id = "";
     if (cursor) {
-      [created, id] = cursor.split("|");
+      const [created, id, ...extra] = cursor.split("|");
       if (
+        extra.length ||
         !/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/.test(created) ||
         !orderIdPattern.test(id ?? "")
-      ) {
+      )
         throw new HttpError(400, "分页参数无效。");
+      const op = direction === "ASC" ? ">" : "<";
+      if (column === "id") {
+        conditions.push(`id ${op} ?`);
+        values.push(id);
+      } else {
+        conditions.push(
+          `(created_at ${op} ? OR (created_at = ? AND id ${op} ?))`,
+        );
+        values.push(created, created, id);
       }
     }
-    const statement = cursor
-      ? env.DB.prepare(
-          "SELECT * FROM orders WHERE created_at < ? OR (created_at = ? AND id < ?) ORDER BY created_at DESC, id DESC LIMIT ?",
-        ).bind(created, created, id, 51)
-      : env.DB.prepare(
-          "SELECT * FROM orders ORDER BY created_at DESC, id DESC LIMIT ?",
-        ).bind(51);
-    const { results } = await statement.all<OrderRow>();
-    const visible = results.slice(0, 50);
-    const last = visible.at(-1);
+    const { results } = await env.DB.prepare(
+      `SELECT * FROM orders WHERE ${conditions.join(" AND ")} ORDER BY ${column} ${direction}, id ${direction} LIMIT ?`,
+    )
+      .bind(...values, 51)
+      .all<OrderRow>();
+    const visible = results.slice(0, 50),
+      last = visible.at(-1);
     return json({
       orders: visible.map(adminOrder),
       next_cursor:
@@ -275,7 +336,7 @@ async function adminRoute(request: Request, env: Env, path: string) {
     });
   }
   const match = path.match(
-    /^\/api\/admin\/orders\/(DO-[A-F0-9]{16})(?:\/(verify-payment|complete|cancel|refund|note))?$/,
+    /^\/api\/admin\/orders\/(DO-[A-F0-9]{16})(?:\/(verify-payment|complete|cancel|refund|note|archive|unarchive))?$/,
   );
   if (!match) throw new HttpError(404, "接口不存在。");
   const [, id, action] = match;
@@ -286,7 +347,12 @@ async function adminRoute(request: Request, env: Env, path: string) {
     throw new HttpError(405, "请求方法不支持。");
   const body = await readJson(request);
   const now = new Date().toISOString();
-  if (action === "note") {
+  if (action === "archive" || action === "unarchive") {
+    onlyFields(body, []);
+    await env.DB.prepare("UPDATE orders SET archived_at = ? WHERE id = ?")
+      .bind(action === "archive" ? now : null, id)
+      .run();
+  } else if (action === "note") {
     onlyFields(body, ["admin_note"]);
     if (
       typeof body.admin_note !== "string" ||
@@ -320,6 +386,16 @@ async function adminRoute(request: Request, env: Env, path: string) {
 
 async function route(request: Request, env: Env): Promise<Response> {
   const path = new URL(request.url).pathname;
+  if (path.startsWith("/api/orders") || path.startsWith("/api/admin/"))
+    await expireOrders(env);
+  if (path === "/api/sale" && request.method === "GET")
+    return json({
+      starts_at: SALE_START,
+      server_now: Date.now(),
+      open: isLocal(request, env) || Date.now() >= SALE_START_MS,
+    });
+  if (path === "/api/supporters" || path === "/api/words")
+    return publicContent(request, env, path);
   if (path === "/api/health" && request.method === "GET")
     return json({ ok: true });
   if (path === "/admin" || path.startsWith("/admin/")) {
@@ -355,6 +431,9 @@ async function route(request: Request, env: Env): Promise<Response> {
 }
 
 export default {
+  async scheduled(_event: unknown, env: Env) {
+    await expireOrders(env);
+  },
   async fetch(request: Request, env: Env): Promise<Response> {
     const origin = request.headers.get("origin");
     const url = new URL(request.url);

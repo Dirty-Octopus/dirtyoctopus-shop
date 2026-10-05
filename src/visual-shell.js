@@ -17,7 +17,9 @@ import { initParallax } from "./portfolio/parallax.js";
 const old = document.querySelector("body > .shell");
 const main = document.querySelector("#main");
 const home = location.pathname === "/" || location.pathname === "/index.html";
-const admin = Boolean(document.querySelector("#orders"));
+const admin = Boolean(
+  document.querySelector("#orders") || document.body.dataset.admin,
+);
 
 const read = (key, fallback) => {
   try {
@@ -39,7 +41,8 @@ if (old && main) {
   old.remove();
   if (admin) {
     document.querySelectorAll('#site a[href^="/"]').forEach((a) => {
-      a.href = "https://shop.dirtyoctopus.net" + a.getAttribute("href");
+      if (!a.getAttribute("href").startsWith("/admin/"))
+        a.href = "https://shop.dirtyoctopus.net" + a.getAttribute("href");
     });
     const logout = document.createElement("a");
     logout.href = "/cdn-cgi/access/logout";
@@ -78,6 +81,8 @@ if (old && main) {
     ["/", "插件商店", "SHOP"],
     ["/orders/", "本设备订单", "MY ORDERS"],
     ["/contact/", "联系方式", "CONTACT"],
+    ["/supporters/", "支持者", "SUPPORTERS"],
+    ["/words/", "我想说的话", "WORDS"],
     ["https://dirtyoctopus.net", "作品集 ↗", "PORTFOLIO"],
   ]
     .map(

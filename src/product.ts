@@ -1,3 +1,4 @@
+import { SALE_START_MS } from "../shared/launch";
 import { $, api, apiBase, busy, copy, loadContacts, message } from "./common";
 import { product, type CustomerOrder } from "../shared/catalog";
 import { checkStorage, saveOrder } from "./storage";
@@ -14,6 +15,15 @@ loadContacts()
 
 buy.addEventListener("click", () =>
   busy(buy, async () => {
+    if (!import.meta.env.DEV && Date.now() < SALE_START_MS) {
+      location.assign("/waiting/");
+      return;
+    }
+    const sale = await api<{ open: boolean }>("/api/sale");
+    if (!sale.open) {
+      location.assign("/waiting/");
+      return;
+    }
     checkStorage();
     const data = await api<{
       order: CustomerOrder;

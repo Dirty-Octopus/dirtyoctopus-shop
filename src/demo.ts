@@ -13,6 +13,7 @@ if (section) {
   const clock = document.querySelector("#demo-time")!;
   const status = document.querySelector("#demo-status")!;
   const canvas = document.querySelector<HTMLCanvasElement>("#demo-wave")!;
+  let track: keyof typeof peaks = "glossy-neuro";
   let version: "before" | "after" = "before",
     serial = 0;
   let pending: { time: number; playing: boolean } | null = null;
@@ -29,7 +30,7 @@ if (section) {
     const ctx = canvas.getContext("2d")!;
     ctx.scale(ratio, ratio);
     const progress = audio.currentTime / (audio.duration || 1);
-    peaks[version].forEach((v, i) => {
+    peaks[track][version].forEach((v, i) => {
       ctx.fillStyle = getComputedStyle(document.body).getPropertyValue(
         i / 256 < progress ? "--accent" : "--secondary",
       );
@@ -74,7 +75,7 @@ if (section) {
         pending = { time: current, playing };
         audio.pause();
         version = next;
-        audio.src = `/assets/audio/glossy-neuro-${version}.mp3`;
+        audio.src = `/assets/audio/${track}-${version}.mp3`;
         document
           .querySelectorAll("[data-demo]")
           .forEach((el) =>
@@ -103,6 +104,27 @@ if (section) {
         sync();
       }),
   );
+  document.querySelector<HTMLSelectElement>("#demo-track")!.onchange = (
+    event,
+  ) => {
+    ++serial;
+    pending = null;
+    audio.pause();
+    track = (event.target as HTMLSelectElement).value as keyof typeof peaks;
+    version = "before";
+    audio.src = `/assets/audio/${track}-before.mp3`;
+    audio.load();
+    document
+      .querySelectorAll("[data-demo]")
+      .forEach((el) =>
+        el.setAttribute(
+          "aria-pressed",
+          String((el as HTMLElement).dataset.demo === "before"),
+        ),
+      );
+    status.textContent = "已切换片段，点击播放试听。";
+    sync();
+  };
   document.querySelector<HTMLButtonElement>("#demo-loop")!.onclick = (e) => {
     audio.loop = !audio.loop;
     const button = e.currentTarget as HTMLButtonElement;

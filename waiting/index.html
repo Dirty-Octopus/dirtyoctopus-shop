@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self' __API_CONNECT_SRC__; object-src 'none'; base-uri 'none'"
+    />
+    <title>敬请等待 / Dirty Octopus</title>
+  </head>
+  <body>
+    <main class="waiting">
+      <p>敬请等待，还有 <strong id="countdown">正在校准时间…</strong> 开售。</p>
+      <p id="sale-ready" hidden>
+        已经开售。<a href="/plugins/spectral-corruptor/">进入插件详情购买 ↗</a>
+      </p>
+      <small id="sale-time">北京时间 2026 年 10 月 6 日 21:09:09</small>
+      <p><a href="/">返回商店</a></p>
+    </main>
+    <script type="module" src="/src/waiting.ts"></script>
+  </body>
+</html>

@@ -54,6 +54,10 @@ export default defineConfig(({ command, mode }) => {
       rollupOptions: {
         input: [
           "index.html",
+          "supporters/index.html",
+          "words/index.html",
+          "waiting/index.html",
+          "console/content/index.html",
           "order/index.html",
           "orders/index.html",
           "contact/index.html",

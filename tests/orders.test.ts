@@ -107,6 +107,8 @@ beforeAll(async () => {
       d1Databases: ["DB"],
     }),
   );
+  vi.useFakeTimers({ toFake: ["Date"] });
+  vi.setSystemTime(new Date("2026-10-06T13:09:09Z"));
   const db = await mf.getD1Database("DB");
   const migration = await readFile(
     new URL("../migrations/0001_orders.sql", import.meta.url),
@@ -114,6 +116,16 @@ beforeAll(async () => {
   );
   await db.batch(
     migration
+      .split(";")
+      .filter((sql) => sql.trim())
+      .map((sql) => db.prepare(sql)),
+  );
+  const migration2 = await readFile(
+    new URL("../migrations/0002_public_content.sql", import.meta.url),
+    "utf8",
+  );
+  await db.batch(
+    migration2
       .split(";")
       .filter((sql) => sql.trim())
       .map((sql) => db.prepare(sql)),
@@ -140,6 +152,9 @@ beforeAll(async () => {
   adminToken = await sign();
 });
 beforeEach(async () => {
+  vi.setSystemTime(new Date("2026-10-06T13:09:09Z"));
+  await env.DB.prepare("DELETE FROM supporters").run();
+  await env.DB.prepare("DELETE FROM site_content").run();
   await env.DB.prepare("DELETE FROM orders").run();
   vi.mocked(env.CREATE_LIMITER.limit).mockResolvedValue({ success: true });
   vi.mocked(env.GLOBAL_CREATE_LIMITER.limit).mockResolvedValue({
@@ -149,6 +164,7 @@ beforeEach(async () => {
   env.ACCESS_AUD = audience;
 });
 afterAll(async () => {
+  vi.useRealTimers();
   vi.restoreAllMocks();
   await mf?.dispose();
 });
@@ -690,5 +706,166 @@ describe("请求限制、限流与 CORS", () => {
     expect(response.headers.get("cache-control")).toBe("no-store");
     expect(response.headers.get("x-content-type-options")).toBe("nosniff");
     expect(response.headers.get("referrer-policy")).toBe("no-referrer");
+  });
+});
+
+function contentAdmin(path: string, body?: unknown, token = adminToken) {
+  return request(
+    "/api/admin/" + path,
+    body === undefined ? "GET" : "POST",
+    body,
+    {
+      origin: "https://dirtyoctopus-shop-api.test-account.workers.dev",
+      "cf-access-jwt-assertion": token,
+      "x-admin-request": "1",
+    },
+  );
+}
+describe("定时开售、过期与归档", () => {
+  it("开售前一毫秒拒绝创建，到点允许；状态使用服务器时间", async () => {
+    vi.setSystemTime(new Date("2026-10-06T13:09:08.999Z"));
+    expect((await request("/api/sale")).status).toBe(200);
+    expect((await (await request("/api/sale")).json()).open).toBe(false);
+    expect(
+      (
+        await request(
+          "/api/orders",
+          "POST",
+          { product_id: "spectral-corruptor" },
+          { "cf-connecting-ip": "192.0.2.1" },
+        )
+      ).status,
+    ).toBe(403);
+    expect(
+      (
+        await env.DB.prepare("SELECT count(*) AS n FROM orders").first<{
+          n: number;
+        }>()
+      )?.n,
+    ).toBe(0);
+    vi.setSystemTime(new Date("2026-10-06T13:09:09Z"));
+    await create();
+  });
+  it("30 分钟到期，拒绝补交；29:59 可提交，已提交不会过期", async () => {
+    const expired = await create(),
+      submitted = await create();
+    vi.setSystemTime(new Date("2026-10-06T13:39:08Z"));
+    expect(
+      (
+        await customer("/payment-reference", submitted, {
+          wechat_transaction_id: reference(),
+        })
+      ).status,
+    ).toBe(200);
+    vi.setSystemTime(new Date("2026-10-06T13:39:09Z"));
+    expect((await (await customer("", expired)).json()).order.status).toBe(
+      "EXPIRED",
+    );
+    expect(
+      (
+        await customer("/payment-reference", expired, {
+          wechat_transaction_id: reference(),
+        })
+      ).status,
+    ).toBe(409);
+    expect((await (await customer("", submitted)).json()).order.status).toBe(
+      "PAYMENT_REFERENCE_SUBMITTED",
+    );
+    expect(
+      (await admin("/" + expired.order.id + "/verify-payment", {})).status,
+    ).toBe(409);
+  });
+  it("归档与恢复不删除记录，不改变客户状态且不泄露归档字段", async () => {
+    const one = await create();
+    expect((await admin("/" + one.order.id + "/archive", {})).status).toBe(200);
+    expect((await (await admin("")).json()).orders).toHaveLength(0);
+    expect(
+      (await (await admin("?archive=archived")).json()).orders,
+    ).toHaveLength(1);
+    const customerRow = (await (await customer("", one)).json()).order;
+    expect(customerRow.status).toBe("PENDING_PAYMENT");
+    expect(customerRow).not.toHaveProperty("archived_at");
+    await admin("/" + one.order.id + "/unarchive", {});
+    expect((await (await admin("")).json()).orders).toHaveLength(1);
+  });
+  it("编号前缀、状态、编号排序有效并拒绝 SQL 片段", async () => {
+    const one = await create(),
+      two = await create();
+    await admin("/" + one.order.id + "/cancel", {});
+    const response = await (
+      await admin("?q=" + one.order.id + "&status=CANCELLED&sort=id_asc")
+    ).json();
+    expect(response.orders.map((o: CustomerOrder) => o.id)).toEqual([
+      one.order.id,
+    ]);
+    const sorted = await (await admin("?sort=id_asc")).json();
+    expect(sorted.orders.map((o: CustomerOrder) => o.id)).toEqual(
+      [one.order.id, two.order.id].sort(),
+    );
+    expect((await admin("?sort=id%3BDROP")).status).toBe(400);
+    expect((await admin("?q=%25")).status).toBe(400);
+  });
+});
+describe("支持者和文字后台权限", () => {
+  it("未认证写入被拒绝，公开 API 不支持提交", async () => {
+    expect((await contentAdmin("words", { body: "bad" }, "")).status).toBe(401);
+    expect((await request("/api/supporters", "POST", {})).status).toBe(405);
+    expect((await request("/api/words", "POST", {})).status).toBe(405);
+  });
+  it("只允许付款核验订单，一单一条、重复修改、退款隐藏且不泄露订单号", async () => {
+    const one = await create(),
+      path = "supporters/" + one.order.id,
+      body = {
+        display_name: "<img src=x>",
+        message: "谢谢\n开发者",
+        published: true,
+      };
+    expect((await contentAdmin(path, body)).status).toBe(409);
+    await admin("/" + one.order.id + "/verify-payment", {});
+    expect((await contentAdmin(path, body)).status).toBe(200);
+    expect(
+      (await contentAdmin(path, { ...body, message: "新留言" })).status,
+    ).toBe(200);
+    const data = await (await request("/api/supporters")).json();
+    expect(data.supporters).toHaveLength(1);
+    expect(data.supporters[0].message).toBe("新留言");
+    expect(data.supporters[0]).not.toHaveProperty("order_id");
+    expect(JSON.stringify(data)).not.toContain(one.order.id);
+    await admin("/" + one.order.id + "/refund", {});
+    expect(
+      (await (await request("/api/supporters")).json()).supporters,
+    ).toHaveLength(0);
+    expect((await contentAdmin(path, body)).status).toBe(409);
+  });
+  it("支持者可隐藏，名称/留言校验；文字保存与清空", async () => {
+    const one = await create();
+    await admin("/" + one.order.id + "/verify-payment", {});
+    const path = "supporters/" + one.order.id;
+    for (const body of [
+      { display_name: "", message: "", published: true },
+      { display_name: "a".repeat(61), message: "", published: true },
+      { display_name: "A", message: "x".repeat(1001), published: true },
+    ])
+      expect((await contentAdmin(path, body)).status).toBe(400);
+    await contentAdmin(path, {
+      display_name: "A",
+      message: "<script>alert(1)</script>",
+      published: false,
+    });
+    expect(
+      (await (await request("/api/supporters")).json()).supporters,
+    ).toHaveLength(0);
+    expect(
+      (await contentAdmin("words", { body: "正文\n<script>纯文本</script>" }))
+        .status,
+    ).toBe(200);
+    expect((await (await request("/api/words")).json()).content.body).toContain(
+      "<script>",
+    );
+    expect(
+      (await contentAdmin("words", { body: "x".repeat(2001) })).status,
+    ).toBe(400);
+    await contentAdmin("words", { body: "" });
+    expect((await (await request("/api/words")).json()).content.body).toBe("");
   });
 });

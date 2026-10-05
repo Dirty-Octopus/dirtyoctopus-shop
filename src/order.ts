@@ -28,6 +28,12 @@ const submit = $<HTMLButtonElement>("#submit-reference");
 
 function render(order: CustomerOrder) {
   current = order;
+  const expiry = $("#expiry-notice");
+  expiry.hidden = !["PENDING_PAYMENT", "EXPIRED"].includes(order.status);
+  expiry.textContent =
+    order.status === "EXPIRED"
+      ? "此订单已超过 30 分钟有效期，不能继续提交付款。若你实际已付款，请私聊发送原订单号和截图，切勿重复付款。"
+      : `请在 ${formatDate(new Date(Date.parse(order.created_at) + 30 * 60 * 1000).toISOString())} 前付款并提交交易单号，超时订单将失效。`;
   $("#order-content").hidden = false;
   $("#restore-section").hidden = true;
   showStatus($("#order-status"), order);
@@ -44,6 +50,7 @@ function render(order: CustomerOrder) {
   $("#after-submission").hidden =
     order.status === "PENDING_PAYMENT" ||
     order.status === "CANCELLED" ||
+    order.status === "EXPIRED" ||
     order.status === "REFUNDED";
   $("#cancel-notice").hidden = order.status !== "CANCELLED";
   $("#refund-notice").hidden = order.status !== "REFUNDED";
@@ -73,7 +80,7 @@ function render(order: CustomerOrder) {
     el.classList.toggle(
       "active",
       Number(el.dataset.step) === stage &&
-        !["CANCELLED", "REFUNDED"].includes(order.status),
+        !["CANCELLED", "REFUNDED", "EXPIRED"].includes(order.status),
     );
   }
 }
@@ -156,3 +163,11 @@ $("#copy-handoff").addEventListener("click", (event) =>
   ),
 );
 void start();
+
+setInterval(() => {
+  if (
+    current?.status === "PENDING_PAYMENT" &&
+    Date.now() >= Date.parse(current.created_at) + 30 * 60 * 1000
+  )
+    void refresh().catch(() => {});
+}, 1000);

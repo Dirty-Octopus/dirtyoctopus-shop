@@ -238,3 +238,30 @@ footer {
 .brand-name strong {
   white-space: nowrap;
 }
+.supporter-list {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+}
+.author-identity {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin: 40px 0;
+}
+.author-words {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.9;
+}
+.navigation-block nav {
+  flex-wrap: wrap;
+}
+#supporter-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+#supporter-form input[type="checkbox"] {
+  width: auto;
+}

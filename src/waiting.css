@@ -1,0 +1,36 @@
+:root {
+  color-scheme: dark;
+  background: #090a0b;
+  color: #ececec;
+  font-family: system-ui, sans-serif;
+}
+body {
+  margin: 0;
+}
+.waiting {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 32px;
+  text-align: center;
+}
+.waiting > p:first-child {
+  font-size: clamp(18px, 3vw, 36px);
+  line-height: 1.9;
+}
+strong {
+  font-variant-numeric: tabular-nums;
+}
+small,
+a {
+  color: #999;
+}
+a {
+  font-size: 14px;
+}
+[hidden] {
+  display: none !important;
+}

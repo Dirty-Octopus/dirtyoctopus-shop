@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#101112" />
+    <meta name="referrer" content="no-referrer" />
+    <meta
+      name="description"
+      content="Dirty Octopus 独立音频插件商店。Spectral Corruptor，探索频域里的声音。微信付款，人工核验与激活。"
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self' __API_CONNECT_SRC__; object-src 'none'; base-uri 'none'; form-action 'self'"
+    />
+    <title>内容管理 / Dirty Octopus</title>
+    <link rel="icon" href="/assets/dirty-octopus.svg" type="image/svg+xml" />
+  </head>
+  <body data-admin="true">
+    <a class="skip" href="#main">跳到主要内容</a>
+    <div class="shell">
+      <header class="masthead">
+        <a class="brand" href="/" aria-label="Dirty Octopus 商店首页"
+          ><img
+            src="/assets/dirty-octopus.svg"
+            alt=""
+            width="70"
+            height="52"
+          /><span
+            >DIRTY OCTOPUS<small>独立音频插件 / AUDIO TOOLS</small></span
+          ></a
+        >
+        <nav aria-label="主导航">
+          <a class="nav active" href="/" aria-current="page"
+            >插件商店<span>SHOP</span></a
+          ><a class="nav" href="#recent">本设备订单<span>MY ORDERS</span></a
+          ><a class="nav" href="https://dirtyoctopus.net"
+            >作品集 ↗<span>PORTFOLIO</span></a
+          >
+        </nav>
+      </header>
+      <main id="main">
+        <nav class="actions" aria-label="后台管理">
+          <a class="button" href="/admin/">订单管理</a
+          ><a class="button" href="/admin/content/">支持者与文字管理</a>
+        </nav>
+        <h1>支持者与文字管理</h1>
+        <p>
+          只录入买家同意公开的昵称及留言。每个已核验订单只有一条记录；重复保存会修改原记录。退款后自动停止公开展示。
+        </p>
+        <div id="message" class="notice" role="status" hidden></div>
+        <section class="panel">
+          <h2>支持者留名</h2>
+          <form id="supporter-form">
+            <label for="supporter-order">关联订单号</label
+            ><input
+              id="supporter-order"
+              required
+              maxlength="19"
+              placeholder="DO-…"
+            /><button type="button" id="load-supporter" class="button">
+              读取该订单留名</button
+            ><label for="supporter-name">公开昵称（最多 60 字符）</label
+            ><input id="supporter-name" required maxlength="60" /><label
+              for="supporter-message"
+              >公开留言（最多 1000 字符，可留空）</label
+            ><textarea
+              id="supporter-message"
+              rows="5"
+              maxlength="1000"
+            ></textarea
+            ><label
+              ><input
+                type="checkbox"
+                id="supporter-published"
+                checked
+              />公开展示</label
+            ><button id="save-supporter" class="button primary">
+              保存留名
+            </button>
+          </form>
+          <p id="supporter-result" role="status"></p>
+        </section>
+        <section class="panel">
+          <h2>已录入支持者</h2>
+          <button id="reload-supporters" class="button">刷新列表</button>
+          <div id="supporter-list"></div>
+          <button id="more-admin-supporters" class="button" hidden>
+            加载更多
+          </button>
+        </section>
+        <section class="panel">
+          <h2>我想说的话</h2>
+          <p>以纯文本展示，保留换行；留空则前台显示“文字正在准备中”。</p>
+          <form id="words-form">
+            <label for="words-body">正文（最多 2000 字符）</label
+            ><textarea
+              id="words-body"
+              rows="12"
+              maxlength="2000"
+              disabled
+            ></textarea
+            ><button id="save-words" class="button primary" disabled>
+              保存并发布文字
+            </button>
+          </form>
+        </section>
+      </main>
+      <footer>
+        <span>DIRTY OCTOPUS / AUDIO TOOLS</span><a href="/admin/">订单管理 ↗</a>
+      </footer>
+    </div>
+    <noscript
+      ><p class="notice">购买与查看订单需要启用 JavaScript。</p></noscript
+    >
+    <script type="module" src="/src/admin-content.ts"></script>
+  </body>
+</html>

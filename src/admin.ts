@@ -59,8 +59,14 @@ function paintRows() {
   $("#empty").hidden = rows.size > 0;
 }
 async function loadOrders(append = false) {
-  const query =
-    append && nextCursor ? `?cursor=${encodeURIComponent(nextCursor)}` : "";
+  const params = new URLSearchParams({
+    q: $<HTMLInputElement>("#filter-id").value.trim(),
+    status: $<HTMLSelectElement>("#filter-status").value,
+    sort: $<HTMLSelectElement>("#filter-sort").value,
+    archive: $<HTMLSelectElement>("#filter-archive").value,
+  });
+  if (append && nextCursor) params.set("cursor", nextCursor);
+  const query = "?" + params.toString();
   const data = await api<{ orders: AdminOrder[]; next_cursor: string | null }>(
     `/api/admin/orders${query}`,
     { admin: true },
@@ -73,6 +79,7 @@ async function loadOrders(append = false) {
 }
 function renderDetail(order: AdminOrder) {
   selected = order;
+  $("#archive-order").textContent = order.archived_at ? "恢复订单" : "归档订单";
   $("#admin-detail").hidden = false;
   $("#detail-title").textContent = order.id;
   showStatus($("#detail-status"), order);
@@ -178,3 +185,25 @@ $("#close-detail").addEventListener("click", () => {
   selected = undefined;
 });
 void busy($<HTMLButtonElement>("#reload"), () => loadOrders());
+
+for (const [value, label] of Object.entries(statusLabels)) {
+  const option = document.createElement("option");
+  option.value = value;
+  option.textContent = label;
+  $("#filter-status").append(option);
+}
+$("#filter-form").onsubmit = (e) => {
+  e.preventDefault();
+  void busy($<HTMLButtonElement>("#apply-filters"), () => loadOrders());
+};
+$("#archive-order").onclick = () =>
+  void busy($<HTMLButtonElement>("#archive-order"), async () => {
+    if (!selected) return;
+    const { order } = await api<{ order: AdminOrder }>(
+      `/api/admin/orders/${selected.id}/${selected.archived_at ? "unarchive" : "archive"}`,
+      { admin: true, body: {} },
+    );
+    renderDetail(order);
+    await loadOrders();
+    message(order.archived_at ? "订单已归档。" : "订单已恢复。");
+  });

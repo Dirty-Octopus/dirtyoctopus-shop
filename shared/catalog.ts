@@ -15,6 +15,7 @@ export const statuses = [
   "COMPLETED",
   "CANCELLED",
   "REFUNDED",
+  "EXPIRED",
 ] as const;
 export type OrderStatus = (typeof statuses)[number];
 export const statusLabels: Record<OrderStatus, string> = {
@@ -24,6 +25,7 @@ export const statusLabels: Record<OrderStatus, string> = {
   COMPLETED: "已完成，激活码已通过 QQ / 微信发送",
   CANCELLED: "订单已取消",
   REFUNDED: "已人工退款",
+  EXPIRED: "订单已过期，请重新创建订单",
 };
 export interface CustomerOrder {
   id: string;
@@ -43,6 +45,7 @@ export interface CustomerOrder {
 }
 export interface AdminOrder extends CustomerOrder {
   admin_note: string;
+  archived_at?: string | null;
 }
 export const orderIdPattern = /^DO-[A-F0-9]{16}$/;
 export const tokenPattern = /^[A-Za-z0-9_-]{43}$/;

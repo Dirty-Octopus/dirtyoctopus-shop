@@ -10,6 +10,7 @@
     "binding": "ASSETS",
     "run_worker_first": true,
   },
+  "triggers": { "crons": ["*/5 * * * *"] },
   "vars": {
     "ENVIRONMENT": "production",
     "ACCESS_TEAM_DOMAIN": "https://noisy-base-4a50.cloudflareaccess.com",
