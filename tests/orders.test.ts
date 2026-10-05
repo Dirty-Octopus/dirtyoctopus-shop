@@ -551,6 +551,39 @@ describe("Cloudflare Access 与管理流程", () => {
   });
 });
 describe("请求限制、限流与 CORS", () => {
+  it("后台同源 crossorigin 静态资源请求可加载，外部来源仍被拒绝", async () => {
+    const backend = "https://dirtyoctopus-shop-api.test-account.workers.dev";
+    for (const path of [
+      "/assets/common.css",
+      "/assets/admin.js",
+      "/assets/font.woff2",
+    ]) {
+      const response = await request(path, "GET", undefined, {
+        origin: backend,
+      });
+      expect(response.status).toBe(200);
+      expect(await response.text()).toBe("admin assets");
+      expect(response.headers.get("Access-Control-Allow-Origin")).toBe(backend);
+      expect(
+        (
+          await request(path, "GET", undefined, {
+            origin: "https://evil.example",
+          })
+        ).status,
+      ).toBe(403);
+    }
+    // 静态资源例外不扩大买家 API 的来源白名单。
+    expect(
+      (
+        await request(
+          "/api/orders",
+          "POST",
+          { product_id: "spectral-corruptor" },
+          { origin: backend },
+        )
+      ).status,
+    ).toBe(403);
+  });
   it("按 IP 限流，返回 Retry-After，不写入订单", async () => {
     vi.mocked(env.CREATE_LIMITER.limit).mockResolvedValue({ success: false });
     const response = await request(

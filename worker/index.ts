@@ -360,9 +360,10 @@ export default {
     const url = new URL(request.url);
     const admin =
       url.pathname === "/api/admin" || url.pathname.startsWith("/api/admin/");
+    const staticResource = url.pathname.startsWith("/assets/");
     const allowedOrigin =
       origin &&
-      (admin
+      (admin || staticResource
         ? origin === url.origin
         : allowedCustomerOrigin(origin, request, env));
     let response: Response;
