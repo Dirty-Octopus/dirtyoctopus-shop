@@ -1,6 +1,7 @@
 import {
   $,
   api,
+  apiBase,
   busy,
   copy,
   formatDate,
@@ -14,8 +15,8 @@ import { checkStorage, recentOrders, saveOrder } from "./storage";
 const buy = $<HTMLButtonElement>("#buy");
 loadContacts()
   .then((ready) => {
-    buy.disabled = !ready;
-    if (!ready) {
+    buy.disabled = !ready || !apiBase;
+    if (!ready || !apiBase) {
       $("#setup-notice").hidden = false;
     }
   })

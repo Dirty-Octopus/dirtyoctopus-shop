@@ -10,6 +10,24 @@ if (errors.length)
     `wrangler.jsonc 格式错误：${errors.map((error) => printParseErrorCode(error.error)).join(", ")}`,
   );
 const missing = [];
+try {
+  const url = new URL(config.apiBase);
+  if (
+    url.protocol !== "https:" ||
+    url.origin !== config.apiBase ||
+    !/^dirtyoctopus-shop-api\.[a-z0-9-]+\.workers\.dev$/.test(url.hostname) ||
+    /REPLACE_ME|YOUR_SUBDOMAIN/i.test(config.apiBase)
+  )
+    throw new Error("invalid origin");
+} catch {
+  missing.push(
+    "public/site-config.json：apiBase 填写实际部署的 https://dirtyoctopus-shop-api.<你的子域>.workers.dev",
+  );
+}
+if (!worker.workers_dev || worker.routes?.length)
+  missing.push(
+    "wrangler.jsonc：保留 workers_dev: true，不配置自定义域名 routes",
+  );
 if (
   ![config.qq, config.wechat].some(
     (value) =>

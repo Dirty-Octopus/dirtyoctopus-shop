@@ -11,7 +11,7 @@
     />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self' https://api.dirtyoctopus.net http://127.0.0.1:8787 http://localhost:8787 ws://127.0.0.1:* ws://localhost:*; object-src 'none'; base-uri 'none'; form-action 'self'"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self' __API_CONNECT_SRC__; object-src 'none'; base-uri 'none'; form-action 'self'"
     />
     <title>音频插件商店 / Dirty Octopus</title>
     <link rel="icon" href="/assets/dirty-octopus.svg" type="image/svg+xml" />
@@ -84,7 +84,7 @@
           hidden
         ></div>
         <p id="setup-notice" class="notice" hidden>
-          商店正在准备上线，联系方式尚未填写，暂未开放购买。
+          商店正在准备上线，暂未开放购买。有问题请通过下方 QQ / 微信联系我。
         </p>
         <section id="recovery-backup" class="panel" hidden>
           <h2>请先保存订单访问凭证</h2>

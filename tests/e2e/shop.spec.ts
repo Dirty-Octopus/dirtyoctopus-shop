@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import type { AdminOrder } from "../../shared/catalog";
+import siteConfig from "../../public/site-config.json" with { type: "json" };
 
 test("生产构建：外部样式、真实联系方式、严格 CSP 与响应式视觉", async ({
   page,
@@ -7,9 +8,15 @@ test("生产构建：外部样式、真实联系方式、严格 CSP 与响应式
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("http://127.0.0.1:4183/");
   await page.evaluate(() => document.fonts.ready);
-  await expect(
-    page.getByRole("button", { name: "创建订单并购买" }),
-  ).toBeEnabled();
+  const buy = page.getByRole("button", { name: "创建订单并购买" });
+  if (siteConfig.apiBase) await expect(buy).toBeEnabled();
+  else {
+    await expect(buy).toBeDisabled();
+    await expect(page.locator("#setup-notice")).toBeVisible();
+  }
+  await expect(page.locator('[data-contact="wechat"]')).toHaveText(
+    siteConfig.wechat,
+  );
   expect(
     await page.evaluate(
       () => getComputedStyle(document.documentElement).backgroundColor,
@@ -21,6 +28,10 @@ test("生产构建：外部样式、真实联系方式、严格 CSP 与响应式
   expect(csp).not.toContain("unsafe-inline");
   expect(csp).not.toContain("localhost");
   expect(csp).not.toContain("127.0.0.1");
+  expect(csp).not.toContain("__API_CONNECT_SRC__");
+  expect(csp).not.toContain("api.dirtyoctopus.net");
+  expect(csp).not.toContain("*.workers.dev");
+  if (siteConfig.apiBase) expect(csp).toContain(siteConfig.apiBase);
   await page.screenshot({
     path: "test-results/shop-desktop.png",
     fullPage: true,
@@ -53,7 +64,9 @@ test("未配置联系方式时阻止购买，实际新付款码与插件图片�
     page.getByRole("button", { name: "创建订单并购买" }),
   ).toBeDisabled();
   await expect(
-    page.getByText("商店正在准备上线，联系方式尚未填写，暂未开放购买。"),
+    page.getByText(
+      "商店正在准备上线，暂未开放购买。有问题请通过下方 QQ / 微信联系我。",
+    ),
   ).toBeVisible();
   const image = page.getByAltText(
     "Spectral Corruptor 的输入输出频谱、模块信号链和频域效果参数界面",
@@ -64,6 +77,20 @@ test("未配置联系方式时阻止购买，实际新付款码与插件图片�
   ).toBe(1180);
   const response = await page.request.get("/assets/newpaymentwx.jpg");
   expect(response.ok()).toBeTruthy();
+});
+test("生产未配置 API 时管理入口保留说明，不跳转到无效域名", async ({
+  page,
+}) => {
+  test.skip(
+    Boolean(siteConfig.apiBase),
+    "已配置实际后端，不能在 CI 访问生产管理页面",
+  );
+  await page.goto("http://127.0.0.1:4183/admin/");
+  await expect(page.locator("#admin-message")).toContainText(
+    "管理后台尚未连接",
+  );
+  await expect(page.locator("#admin-link")).toBeHidden();
+  await expect(page).toHaveURL("http://127.0.0.1:4183/admin/");
 });
 test("真实本地 Worker：创建 → 提交 → 刷新 → 最近订单，不会误报付款确认", async ({
   page,

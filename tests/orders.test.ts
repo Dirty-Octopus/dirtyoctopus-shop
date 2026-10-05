@@ -27,7 +27,7 @@ function request(
   method = "GET",
   body?: unknown,
   headers: Record<string, string> = {},
-  base = "https://api.dirtyoctopus.net",
+  base = "https://dirtyoctopus-shop-api.test-account.workers.dev",
 ) {
   return worker.fetch(
     new Request(base + path, {
@@ -71,7 +71,7 @@ function admin(
     body === undefined ? "GET" : "POST",
     body,
     {
-      origin: "https://api.dirtyoctopus.net",
+      origin: "https://dirtyoctopus-shop-api.test-account.workers.dev",
       "cf-access-jwt-assertion": token,
       "x-admin-request": "1",
       ...extra,
@@ -600,11 +600,14 @@ describe("请求限制、限流与 CORS", () => {
       [" ".repeat(9000), { "content-type": "application/json" }, 413],
     ] as [string, Record<string, string>, number][]) {
       const response = await worker.fetch(
-        new Request("https://api.dirtyoctopus.net/api/orders", {
-          method: "POST",
-          headers,
-          body,
-        }),
+        new Request(
+          "https://dirtyoctopus-shop-api.test-account.workers.dev/api/orders",
+          {
+            method: "POST",
+            headers,
+            body,
+          },
+        ),
         env,
       );
       expect(response.status).toBe(status);

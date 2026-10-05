@@ -8,8 +8,8 @@ export const local = ["localhost", "127.0.0.1", "[::1]"].includes(
   location.hostname,
 );
 export const apiBase = (
-  import.meta.env.VITE_API_BASE ||
-  (local ? "http://127.0.0.1:8787" : "https://api.dirtyoctopus.net")
+  __SHOP_API_BASE__ ||
+  (import.meta.env.DEV && local ? "http://127.0.0.1:8787" : "")
 ).replace(/\/$/, "");
 export const $ = <T extends HTMLElement = HTMLElement>(selector: string): T => {
   const element = document.querySelector<T>(selector);
@@ -29,6 +29,10 @@ export async function api<T>(
   path: string,
   options: { token?: string; body?: unknown; admin?: boolean } = {},
 ): Promise<T> {
+  if (!options.admin && !apiBase)
+    throw new Error(
+      "商店正在准备上线，暂未开放购买。已有订单请联系 QQ / 微信查询。",
+    );
   const headers: Record<string, string> = {};
   if (options.token) headers.Authorization = `Bearer ${options.token}`;
   if (options.body !== undefined) headers["Content-Type"] = "application/json";

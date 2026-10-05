@@ -10,14 +10,12 @@
   <body>
     <main class="shell panel">
       <h1>订单管理</h1>
-      <p>正在进入 Cloudflare Access 保护的管理页面…</p>
-      <a
-        id="admin-link"
-        class="button primary"
-        href="https://api.dirtyoctopus.net/admin/"
-        >登录并管理订单</a
-      >
+      <p id="admin-message" role="status">
+        正在进入 Cloudflare Access 保护的管理页面…
+      </p>
+      <a id="admin-link" class="button primary" hidden>登录并管理订单</a>
       <p class="muted">需要使用获准的管理员邮箱登录。</p>
+      <noscript>管理入口需要启用 JavaScript。</noscript>
     </main>
     <script type="module" src="/src/admin-entry.ts"></script>
   </body>
