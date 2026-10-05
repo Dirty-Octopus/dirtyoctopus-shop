@@ -74,7 +74,7 @@ test("未配置联系方式时阻止购买，实际新付款码与插件图片�
   await expect(image).toBeVisible();
   expect(
     await image.evaluate((el) => (el as HTMLImageElement).naturalWidth),
-  ).toBe(1180);
+  ).toBe(2360);
   const response = await page.request.get("/assets/newpaymentwx.jpg");
   expect(response.ok()).toBeTruthy();
 });
