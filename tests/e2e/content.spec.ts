@@ -41,18 +41,19 @@ test("支持者/文字按纯文本展示，前台没有编辑表单", async ({ p
       },
     }),
   );
-  await page.route("**/api/words", (r) =>
-    r.fulfill({
-      json: { content: { body: "第一行\n第二行 <script>test</script>" } },
-    }),
-  );
+  let wordsRequests = 0;
+  await page.route("**/api/words", (r) => {
+    wordsRequests++;
+    return r.abort();
+  });
   await page.goto("http://127.0.0.1:4183/supporters/");
   await expect(page.locator("#public-content")).toContainText("<img src=x>");
   await expect(page.locator("#public-content img, #main form")).toHaveCount(0);
   await page.goto("http://127.0.0.1:4183/words/");
   await expect(page.locator("#public-content")).toContainText(
-    "第二行 <script>test</script>",
+    "祝你开心幸福，就这样吧。",
   );
+  expect(wordsRequests).toBe(0);
   await expect(
     page.locator("#public-content script, #main textarea"),
   ).toHaveCount(0);
@@ -94,7 +95,7 @@ test("内容管理入口可录入和修改支持者、保存文字（模拟 Acce
   expect(saved).toBe(1);
   await page.locator("#words-body").fill("我想说的话\n第二行");
   await visualClick(page.locator("#save-words"));
-  await expect(page.locator("#message")).toHaveText("文字已发布。");
+  await expect(page.locator("#message")).toHaveText("后台草稿已保存；前台文字需更新静态页面并部署。");
   expect(words).toContain("第二行");
 });
 test("新增两组 A/B 音频能实际解码播放，切换片段停止上一段", async ({

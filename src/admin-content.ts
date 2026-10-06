@@ -89,7 +89,7 @@ $("#words-form").onsubmit = (e) => {
       admin: true,
       body: { body: $<HTMLTextAreaElement>("#words-body").value },
     });
-    $("#message").textContent = "文字已发布。";
+    $("#message").textContent = "后台草稿已保存；前台文字需更新静态页面并部署。";
     $("#message").hidden = false;
   });
 };

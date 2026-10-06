@@ -1,13 +1,7 @@
 import { $, api } from "./common";
 const target = $("#public-content");
 if (location.pathname.startsWith("/words")) {
-  api<{ content: { body: string } }>("/api/words")
-    .then((data) => {
-      target.textContent = data.content.body || "文字正在准备中。";
-    })
-    .catch(() => {
-      target.textContent = "暂时无法加载，请刷新重试。";
-    });
+  // Developer note is embedded in HTML and needs no API connection.
 } else {
   let cursor: string | null = null,
     first = true;
