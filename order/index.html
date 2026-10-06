@@ -12,8 +12,9 @@
     />
     <title>我的订单 / Dirty Octopus</title>
     <link rel="icon" href="/assets/dirty-octopus.svg" type="image/svg+xml" />
+    <script type="module" blocking="render" src="/src/order.ts"></script>
   </head>
-  <body>
+  <body data-treatment="halftone">
     <a class="skip" href="#main">跳到主要内容</a>
     <div class="shell">
       <header class="masthead">
@@ -228,6 +229,5 @@
       </footer>
     </div>
     <noscript><p class="notice">查看订单需要启用 JavaScript。</p></noscript>
-    <script type="module" src="/src/order.ts"></script>
   </body>
 </html>

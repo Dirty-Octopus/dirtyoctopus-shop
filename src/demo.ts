@@ -4,7 +4,7 @@ if (section) {
   const audio = new Audio("/assets/audio/glossy-neuro-before.mp3");
   audio.preload = "metadata";
   audio.volume = 0.65;
-  audio.loop = true;
+  audio.loop = false;
   audio.id = "demo-audio";
   audio.hidden = true;
   section.append(audio);

@@ -75,3 +75,41 @@ test("入口水声、点击、Logo、预选中、滚动音效与静音记忆", a
     "false",
   );
 });
+
+test("详情图片共享过渡、默认单次试听与反复切页", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", error => errors.push(error.message));
+  await page.addInitScript(() => {
+    window.addEventListener("pagereveal", (event) => {
+      const transition = event.viewTransition;
+      if (transition) transition.ready.then(() => {
+        document.documentElement.dataset.transitionReady = "true";
+      }).catch(() => { document.documentElement.dataset.transitionReady = "failed"; });
+    });
+  });
+  await page.goto("http://127.0.0.1:4183/");
+  await page.locator("#enter").click();
+  await expect(page.locator("#boot")).toBeHidden();
+  for (let i = 0; i < 3; i++) {
+    await visualClick(page.locator('.preview a'));
+    await expect(page.locator("#demo-loop")).toHaveAttribute("aria-pressed", "false");
+    await expect(page.locator("#demo-track option")).toHaveText(["Neuro Squarifier", "additive pads", "cool arps"]);
+    expect(await page.locator("#demo-audio").evaluate((el: HTMLAudioElement) => el.loop)).toBe(false);
+    await expect(page.locator("html")).toHaveAttribute("data-transition-ready", "true");
+    const image = await page.locator(".preview").boundingBox();
+    const copy = await page.locator(".product-copy").boundingBox();
+    expect(image!.x + image!.width).toBeLessThanOrEqual(copy!.x);
+    await page.evaluate(async () => {
+      await Promise.all(document.getAnimations().filter(animation =>
+        animation.effect instanceof KeyframeEffect && animation.effect.pseudoElement?.startsWith("::view-transition")
+      ).map(animation => animation.finished.catch(() => {})));
+    });
+    await page.screenshot({ path: "test-results/product-detail.png" });
+    await visualClick(page.locator('.navigation-block a[href="/contact/"]'));
+    await expect(page.locator("#contact-title")).toBeVisible();
+    await visualClick(page.locator('.navigation-block a[href="/"]'));
+    await expect(page.locator("#boot")).toBeHidden();
+    await expect(page.locator("#site")).toBeVisible();
+  }
+  expect(errors).toEqual([]);
+});

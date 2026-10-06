@@ -224,8 +224,26 @@ if (old && main) {
   document.addEventListener("portalentered", () => {
     if (location.hash) scrollToSection(location.hash);
   });
+  const prepareTransition = (event) => {
+    const transition = event.viewTransition;
+    if (!transition) return;
+    if (!motionAllowed()) { transition.skipTransition(); return; }
+    // SVG displacement on the viewport can invalidate shared-element snapshots.
+    document.documentElement.classList.add("page-transition");
+    transition.finished.finally(() => {
+      document.documentElement.classList.remove("page-transition");
+    }).catch(() => {});
+  };
+  window.addEventListener("pageswap", prepareTransition);
+  window.addEventListener("pagereveal", prepareTransition);
+  document.body.classList.add("visual-ready");
+  let entered = false;
+  try { entered = sessionStorage.getItem("shop-entered") === "true"; } catch {}
+  document.addEventListener("portalentered", () => {
+    try { sessionStorage.setItem("shop-entered", "true"); } catch {}
+  });
   let logo;
-  if (home) {
+  if (home && !entered) {
     document.body.classList.add("boot-visible");
     document.querySelector("#site").inert = true;
     const portal = initPortal({

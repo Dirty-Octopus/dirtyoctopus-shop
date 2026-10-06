@@ -6,8 +6,9 @@
     <meta name="robots" content="noindex,nofollow" />
     <meta name="referrer" content="no-referrer" />
     <title>进入订单管理 / Dirty Octopus</title>
+    <script type="module" blocking="render" src="/src/admin-entry.ts"></script>
   </head>
-  <body>
+  <body data-treatment="halftone">
     <main class="shell panel">
       <h1>订单管理</h1>
       <p id="admin-message" role="status">
@@ -17,6 +18,5 @@
       <p class="muted">需要使用获准的管理员邮箱登录。</p>
       <noscript>管理入口需要启用 JavaScript。</noscript>
     </main>
-    <script type="module" src="/src/admin-entry.ts"></script>
   </body>
 </html>

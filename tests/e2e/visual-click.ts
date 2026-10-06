@@ -5,7 +5,13 @@ import { lensDisplayPoint } from "../../src/portfolio/crt.js";
 export async function visualClick(control: Locator) {
   await expect(control).toBeVisible();
   await expect(control).toBeEnabled();
-  await control.page().evaluate(() => document.fonts.ready);
+  await control.page().evaluate(async () => {
+    await document.fonts.ready;
+    // Native cross-page snapshots temporarily cover the live controls.
+    await Promise.all(document.getAnimations().filter(animation =>
+      animation.effect instanceof KeyframeEffect && animation.effect.pseudoElement?.startsWith("::view-transition")
+    ).map(animation => animation.finished.catch(() => {})));
+  });
   await expect
     .poll(async () =>
       control.evaluate(async (el) => {

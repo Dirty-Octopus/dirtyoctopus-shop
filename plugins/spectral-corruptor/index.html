@@ -15,8 +15,9 @@
     />
     <title>Spectral Corruptor / Dirty Octopus</title>
     <link rel="icon" href="/assets/dirty-octopus.svg" type="image/svg+xml" />
+    <script type="module" blocking="render" src="/src/product.ts"></script>
   </head>
-  <body>
+  <body data-treatment="halftone">
     <a class="skip" href="#main">跳到主要内容</a>
     <div class="shell">
       <header class="masthead">
@@ -40,7 +41,7 @@
         </nav>
       </header>
       <main id="main">
-        <section class="product-hero" aria-labelledby="product-title">
+        <section class="product-hero product-detail" aria-labelledby="product-title">
           <div class="product-copy">
             <p class="eyebrow">FREQUENCY DOMAIN / AUDIO PLUGIN</p>
             <h1 id="product-title">SPECTRAL<br /><span>CORRUPTOR</span></h1>
@@ -110,13 +111,13 @@
               时保留播放位置，不作响度归一化；部分片段长度不同，超出长度时跳至结尾。
             </p>
           </div>
-          <label for="demo-track">试听片段</label
+          <label for="demo-track">试听预设</label
           ><select id="demo-track">
             <option value="glossy-neuro">
-              Glossy Neuro / Neuro Squarifier
+              Neuro Squarifier
             </option>
-            <option value="additive-pads">Additive Pads</option>
-            <option value="cool-arps">Cool Arps</option>
+            <option value="additive-pads">additive pads</option>
+            <option value="cool-arps">cool arps</option>
           </select>
           <div class="demo-switch" role="group" aria-label="处理版本">
             <button data-demo="before" aria-pressed="true">A / 处理前</button
@@ -135,8 +136,8 @@
           />
           <div class="demo-controls">
             <button id="demo-play" class="button primary">播放试听 ▶</button
-            ><button id="demo-loop" class="button" aria-pressed="true">
-              循环：开</button
+            ><button id="demo-loop" class="button" aria-pressed="false">
+              循环：关</button
             ><span id="demo-time" class="demo-time">0:00 / 0:00</span
             ><label for="demo-volume">音量</label
             ><input
@@ -192,6 +193,5 @@
     <noscript
       ><p class="notice">购买与查看订单需要启用 JavaScript。</p></noscript
     >
-    <script type="module" src="/src/product.ts"></script>
   </body>
 </html>

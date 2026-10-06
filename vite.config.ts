@@ -28,6 +28,16 @@ export default defineConfig(({ command, mode }) => {
     define: { __SHOP_API_BASE__: JSON.stringify(apiBase) },
     plugins: [
       {
+        name: "shop-ready-before-paint",
+        transformIndexHtml: {
+          order: "post",
+          handler: (html) => html.replace(
+            /<script type="module"(?![^>]*blocking=)/g,
+            '<script type="module" blocking="render"',
+          ),
+        },
+      },
+      {
         name: "shop-csp",
         // Vite 开发模式用 style 标签热更新 CSS；生产构建仍只允许外部样式。
         transformIndexHtml: (html) => {
