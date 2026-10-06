@@ -333,3 +333,8 @@ QQ 讨论群在 `public/site-config.json` 的 `qqGroup` 中统一配置，目前
 - 新增接口：公开只读 `GET /api/supporters`、`GET /api/words`；后台 `GET /api/admin/supporters`、`GET/POST /api/admin/supporters/:orderId`、`GET/POST /api/admin/words`、`POST /api/admin/orders/:id/archive`、`POST /api/admin/orders/:id/unarchive`。后台写入继续验证 Access JWT、同源 Origin 及 `X-Admin-Request`。
 - migration `0002_public_content.sql` 扩展订单状态并保留已有订单，增加归档、过期时间与内容表。部署前先导出 D1 备份，再执行 migration，最后部署 Worker。备份不得提交 Git。
 - 试听现有 Glossy Neuro，另加 Additive Pads、Cool Arps 两组。运行 `python3 scripts/prepare-demo.py` 从根目录本地 WAV 生成 MP3 与波形；只提交转换后的资源。两组新增素材前后长度不同，A/B 切换保留时间并限制到目标片段长度，切换整组片段会暂停并回到开头。
+
+### 插件手册与公开下载
+
+详情页提供 `/manuals/Spectral_Corruptor_Manual_ZH.pdf`、`/manuals/Spectral_Corruptor_Manual_EN.pdf` 阅读入口，源文件原样放在 `public/manuals/`。
+Windows 和 macOS 下载在 `/api/sale` 确认开售后自动开放，直接使用 GitHub latest release ZIP 链接，无需订单、登录或激活码。开售前或状态无法确认时保持禁用，并自动重试。安装说明和 QQ 群提示始终显示。发布插件 Release 时需确保附件名称分别为 `SpectralCorruptor-Windows.zip`、`SpectralCorruptor-macOS.zip`。

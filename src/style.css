@@ -910,3 +910,17 @@ dialog .button {
     scroll-behavior: auto !important;
   }
 }
+
+.plugin-resources { margin: 44px 0; }
+.resource-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; align-items: start; }
+.plugin-resources h3 { margin: 0 0 12px; }
+.plugin-resources .actions + h3 { margin-top: 32px; }
+.install-notice { padding: 24px; border: 2px solid var(--accent, #d6ed47); background: #191c15; }
+.install-notice h4 { margin: 22px 0 8px; }
+.install-notice code { display: inline-block; max-width: 100%; overflow-wrap: anywhere; font-size: 13px; color: #e7edc5; }
+.install-notice ul { padding-left: 20px; }
+.install-notice li { margin: 8px 0; }
+.install-help { border-top: 1px solid #65703c; padding-top: 16px; font-weight: 600; }
+.plugin-resources button:disabled { opacity: .45; cursor: not-allowed; }
+@media (max-width: 760px) { .resource-grid { grid-template-columns: 1fr; } .install-notice { padding: 18px; } }
+.plugin-resources button:disabled { color: #929292; border-color: #626262; background: #202020; opacity: 1; }
