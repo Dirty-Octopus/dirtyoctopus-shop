@@ -9,6 +9,9 @@ async function bring(control: Locator) {
 test("主站视觉：严格 CSP、真实 A/B 播放、保留位置与独立设置", async ({
   page,
 }) => {
+  await page.route("**/api/sale", route => route.fulfill({
+    json: { open: false, server_now: Date.now() },
+  }));
   const errors: string[] = [];
   const audioRequests: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
