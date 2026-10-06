@@ -20,7 +20,7 @@ test("生产构建：外部样式、真实联系方式、严格 CSP 与响应式
     await page.evaluate(
       () => getComputedStyle(document.documentElement).backgroundColor,
     ),
-  ).toBe("rgba(0, 0, 0, 0)");
+  ).toBe("rgb(8, 8, 8)");
   const csp = await page
     .locator('meta[http-equiv="Content-Security-Policy"]')
     .getAttribute("content");

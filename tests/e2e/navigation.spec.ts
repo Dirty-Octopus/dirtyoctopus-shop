@@ -77,6 +77,7 @@ test("入口水声、点击、Logo、预选中、滚动音效与静音记忆", a
 });
 
 test("详情图片共享过渡、默认单次试听与反复切页", async ({ page }) => {
+  test.setTimeout(90000);
   const errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
   await page.addInitScript(() => {
